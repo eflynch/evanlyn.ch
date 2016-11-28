@@ -1,0 +1,35 @@
+body {
+    background-color: #182C31;
+    margin:0;
+}
+
+h1 {
+    color: rgba(256,256,256,0.6);
+    text-align: center;
+    font-family: sans-serif;
+    margin:0;
+}
+
+.line {
+    z-index: 2;
+    position: absolute;
+    background-color: rgba(256,256,256,0.3);
+}
+
+.box {
+    z-index: 1;
+    position: absolute;
+    overflow: hidden;
+}
+
+.box.slow-transitions {
+    transition: top 8s ease, left 8s ease, width 8s ease, height 8s ease, -webkit-clip-path 8s ease;
+}
+
+.line.slow-transitions {
+    transition: top 10s ease, left 10s ease, width 10s ease, height 10s ease, -webkit-clip-path 10s ease;
+}
+
+.fast-transitions {
+    transition: top 1s ease, left 1s ease, width 1s ease, height 1s ease, -webkit-clip-path 1s ease;
+}

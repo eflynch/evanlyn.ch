@@ -1,43 +1,48 @@
 import React from 'react';
 import FontAwesome from "react-fontawesome";
 
-import Grid from './grid';
-import Box from "./box";
+import Sound from './sound';
+import Resume from './resume';
+import Things from './things';
+
+class View extends React.Component {
+    render () {
+        if (this.props.view === this.props.tag){
+            return (
+                <div>
+                    <h1>> <a href="">evanlyn.ch</a> > {this.props.name}</h1>
+                    <div>{this.props.children}</div>
+                </div>
+            );
+        } else {
+            return <div/>;
+        }
+    }
+}
 
 class App extends React.Component {
     render () {
+        if (this.props.view === ""){
+            return (
+                <div>
+                    <h1>> <a href="">evanlyn.ch</a></h1>
+                    <div style={{marginLeft: 50}}>
+                        <h2>> res</h2>
+                        <h2>> <a href="#things">things</a></h2>
+                        <h2>> <a href="#sounds">sounds</a></h2>
+                    </div>
+                </div>
+            );
+        }
         return (
             <div>
-                <h1 style={{height:"5%", minHeight: 30}}>evanlyn.ch</h1>
-                <div style={{height:"95%", width: "100%", position: "relative"}}>
-                    <Grid selectedBox={this.props.selectedBox} fast={this.props.fast} vs={this.props.vs} hs={this.props.hs} onSelect={this.props.onSelect}>
-                        <Box>
-                            <div style={{
-                                margin:"auto",
-                                width: 20,
-                                color: "white",
-                                fontSize: 40
-                            }}>
-                                <FontAwesome name="th" style={{display:"inline-block", lineHeight:"100%", height:"100%", verticalAlign:"middle"}}/> 
-                            </div>
-                        </Box>
-                        <Box>
-                        </Box>
-                        <Box>
-                            <iframe src="http://evanlyn.ch/static/conway/phase2/phase2.html" style={{width: "100%", height: "100%"}}/>
-                        </Box>
-                        <Box>
-                        </Box>
-                        <Box>
-                        </Box>
-                        <Box>
-                        </Box>
-                    </Grid>
-                </div>
+                <View view={this.props.view} name="sounds" tag="#sounds"><Sound/></View>
+                <View view={this.props.view} name="things" tag="#things"><Things/></View>
+                <View view={this.props.view} name="res" tag="#res"><Resume/></View>
             </div>
         );
     }
 }
-App.defaultProps = {numBoxes: 4};
 
 module.exports = App;
+

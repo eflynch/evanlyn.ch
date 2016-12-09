@@ -31,7 +31,14 @@ document.addEventListener("DOMContentLoaded", function (){
     getJSON("trunk.mgl", function(trunk){
         var content = document.getElementById("content");
 
-        render(<Magnolial initTrunk={trunk} onUpdate={function(trunk, head, focus){
+        if (window.location.hash !== ""){
+            var initHead = window.location.hash.substring(1);
+        } else {
+            var initHead = undefined;
+        }
+        render(<Magnolial initTrunk={trunk} initHead={initHead} onUpdate={function(trunk, head, focus){
+            console.log(head);
+            window.location.hash = head;
         }} onBlur={function(e){}}j/>, content);
     });
 });

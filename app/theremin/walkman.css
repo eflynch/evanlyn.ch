@@ -1,9 +1,15 @@
 .WALKMAN {
+    padding: 10px;
     font-family: monospace;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
-.WALKMAN h1 {
-    font-size: 36px;
+.WALKMAN .elapsed-time {
+    font-size: 10px;
 }
 
 .WALKMAN li {
@@ -16,10 +22,14 @@
 }
 
 .WALKMAN .disabled {
-    color: #303030;
+    opacity: 0.3;
 }
 
 .WALKMAN .selected {
     background-color: #0D6A91;
     border-radius: 4px;
+}
+
+.WALKMAN .fa {
+    cursor:pointer;
 }

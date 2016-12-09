@@ -1,9 +1,9 @@
 body {
-    background-color: #100B0E;
-    color: #65A74D;
+    background-color: #2d405a;
+    color: #44ff00;
     font-size: 20px;
-    -moz-transition: all 1s ease-in;
-    -webkit-transition: all 1s ease-in;
-    -o-transition: all 1s ease-in;
-    transition: all 1s ease-in;
+}
+
+.WALKMAN {
+    width: 400;
 }

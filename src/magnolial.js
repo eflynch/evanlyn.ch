@@ -115,6 +115,9 @@ class Magnolial extends React.Component {
         if (this.props.hasOwnProperty('initTrunk')){
             this.initTrunk(this.props.initTrunk);
         }
+        if (this.props.hasOwnProperty('initHead')){
+            this.setState({headSerial: this.props.initHead});
+        }
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.hasOwnProperty('initTrunk')){
@@ -407,7 +410,7 @@ class Magnolial extends React.Component {
         if (child.childs.length === 0 && child.value.link !== null && child.value.link !== undefined){
             window.location = child.value.link;
         }
-        this.props.onUpdate(this.state.trunk, child._serial, this.state.eeeeeSerial);
+        this.props.onUpdate(this.state.trunk, child._serial, this.state.focusSerial);
         // this.t.setCollapsed(child, false);
         this.setState({
             headSerial: child._serial

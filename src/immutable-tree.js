@@ -60,7 +60,9 @@ class ImmutableTree {
             }
 
             child._parent = _parent;
-            child._serial = ImmutableTree.makeSerial();
+            if (child._serial === undefined){
+                child._serial = ImmutableTree.makeSerial();
+            }
             node_hash[child._serial] = child;
             for (var i=0; i < child.childs.length; i++){
                 formatChild(child.childs[i], child._serial);

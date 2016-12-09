@@ -114,10 +114,14 @@ class Magnolial extends React.Component {
     componentWillMount() {
         if (this.props.hasOwnProperty('initTrunk')){
             this.initTrunk(this.props.initTrunk);
+
+            if (this.props.hasOwnProperty('initHead')){
+                if (this.t.node_hash[this.props.initHead] !== undefined){
+                    this.setState({headSerial: this.props.initHead});
+                }
+            }
         }
-        if (this.props.hasOwnProperty('initHead')){
-            this.setState({headSerial: this.props.initHead});
-        }
+        
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.hasOwnProperty('initTrunk')){

@@ -1,0 +1,25 @@
+.WALKMAN {
+    font-family: monospace;
+}
+
+.WALKMAN h1 {
+    font-size: 36px;
+}
+
+.WALKMAN li {
+    list-style: none;
+    cursor: pointer;
+}
+
+.WALKMAN li:hover {
+    font-weight:bold;
+}
+
+.WALKMAN .disabled {
+    color: #303030;
+}
+
+.WALKMAN .selected {
+    background-color: #0D6A91;
+    border-radius: 4px;
+}

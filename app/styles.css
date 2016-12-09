@@ -1,5 +1,4 @@
 body {
-    margin:10;
     font-family: monospace;
 }
 
@@ -17,3 +16,208 @@ a:hover {
     color: black;
 }
 
+body {
+    background-color: black !important;
+}
+
+input {
+    outline: none;
+    background-color:black;
+    width: 48%;
+    color: gray !important;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+iframe {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+input:focus {
+    color: black !important;
+    background-color: #202020;
+}
+
+.MAGNOLIAL_seperator {
+    background-color: transparent;
+    border: none;
+    font-size: 16;
+    border-radius: 5px;
+    margin-left: 3px;
+    margin-right: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    outline: none;
+    display: inline-block;
+    text-align: center;
+    width: 3%;
+    min-width: 20px
+}
+
+.MAGNOLIAL_seperator:focus {
+    background-color: #202020;
+}
+
+.MAGNOLIAL {
+    padding-top: 20px;
+    padding-bottom: 30px;
+    font-family: monospace;
+    background-color: black;
+    color: #1C8173;
+}
+
+.MAGNOLIAL_decoration {
+    width: 15px;
+    font-size: 20px !important;
+    margin-right: 6px;
+    margin-top: 6px;
+    vertical-align: top;
+    display: inline-block;
+    cursor: pointer;
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
+    -o-user-select: none; 
+}
+
+.MAGNOLIAL .MAGNOLIAL_decoration.MAGNOLIAL_completed {
+    color: gray;
+}
+
+.MAGNOLIAL_error {
+    color: red;
+    padding-left: 5px;
+}
+
+
+.MAGNOLIAL p {
+    color: #F6E7BA;
+    font-size: 22;
+    margin: 0;
+    padding: 0;
+    padding-left: 22px;
+}
+
+.MAGNOLIAL ul {
+    margin: 0;
+    margin-left: 9px;
+    padding-left: 26px;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #202020;
+}
+
+.MAGNOLIAL li {
+    list-style: none;
+}
+
+.MAGNOLIAL_list {
+}
+
+.MAGNOLIAL_hidden {
+    display: none;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_wrapper {
+    display: inline-block;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    width: 90%;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_top {
+    position:absolute;
+    top: 0;
+    left: 0;
+    color: transparent;
+    z-index: 1;
+    min-width: 100px;
+    min-height: 22px;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_bottom {
+    color: #1C8173;
+    z-index: 0;
+    min-width: 100px;
+    min-height: 22px;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce {
+    display: inline-block;
+    outline: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-weight: 500;
+    font-size: 22px;
+    font-family: monospace;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_bottom.MAGNOLIAL_focused {
+    background-color: #202020;
+    border-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_focused{
+    color: #1A74CB;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_readonly {
+    color:transparent!important;
+}
+
+.MAGNOLIAL h2 {
+    margin: 0;
+    padding-bottom: 10px;
+    font-size: 22px;
+    display: inline-block;
+}
+
+.MAGNOLIAL h1 {
+    padding-bottom: 10px;
+    margin: 0;
+    display: inline-block;
+    width: 200px;
+}
+
+.MAGNOLIAL h1 div.MAGNOLIAL_ce { 
+    font-weight: 900;
+    font-size: 22px;
+    color: #F6E7BA!important;
+}
+
+.MAGNOLIAL_breadcrumb {
+    font-weight: 100;
+    color: #807861;
+    cursor: pointer;
+}
+
+.MAGNOLIAL_breadcrumb:hover {
+}
+
+.MAGNOLIAL_breadcrumb_sym {
+    font-weight: 100;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: inline-block;
+    color: #DB9E31;
+
+}

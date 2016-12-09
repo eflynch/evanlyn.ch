@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <script type='text/javascript' src='jquery.js'></script>
+        <script type='text/javascript' src='conway.js'></script>
+        <script type='text/javascript'>
+          document.addEventListener('DOMContentLoaded', function(){
+            var conwayState = ConwayState(70, 50, 10);
+            var conwayView = ConwayView(conwayState, 'game');
+            var conwayController = ConwayController(conwayState, conwayView);
+            var speed = 100;
+            $('.start').on('click', function() {conwayController.start(speed);});
+            $('.faster').on('click', function() {speed -= 10; conwayController.start(speed);});
+            $('.slower').on('click', function() {speed += 10; conwayController.start(speed);});
+            $('.stop').on('click', function() {conwayController.stop();});
+            $('.step').on('click', function() {conwayController.step();});
+            $('.reset').on('click', function() {conwayController.reset();});
+            $('.colorpicker').on('change', function(e) {conwayState.setColor(e.currentTarget.value)});
+            conwayController.init();
+          });
+        </script>
+        <link type='text/css' rel='stylesheet' href='phase2.css'/>
+    </head>
+    <body>
+        <div id='controls'>
+            <h1> Conway's Game of Life With Colors! </h1>
+            <button class='start'>Start</button>
+            <button class='faster'>Faster</button>
+            <button class='slower'>Slower</button>
+            <button class='stop'>Stop</button>
+            <button class='step'>Step</button>
+            <button class='reset'>Reset</button>
+            <input type='color' class='colorpicker'>
+        </div>
+        <div id='game'></div>
+    </body>
+</html>

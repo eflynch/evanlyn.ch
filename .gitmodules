@@ -1,0 +1,3 @@
+[submodule "eflynch.github.io"]
+	path = eflynch.github.io
+	url = git@github.com:eflynch/eflynch.github.io

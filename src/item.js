@@ -78,7 +78,7 @@ class Item extends React.Component {
     }
 
     render(){
-        return (
+        var listItem = (
             <li>
                 <rb.Col lg={12}>
                     <rb.Row onFocus={this.onFocus}>
@@ -101,6 +101,14 @@ class Item extends React.Component {
                 </rb.Col>
             </li>
         );
+
+        if (this.props.trunk.value.link !== null && this.props.trunk.value.link !== undefined){
+            return <a href={this.props.trunk.value.link}>{listItem}</a>;
+        } 
+        if (this.props.trunk.value.content !== null && this.props.trunk.value.content !== undefined){
+            return <div className="iframe-link">{listItem}</div>;
+        }
+        return <div className="normal">{listItem}</div>;
     }
 }
 

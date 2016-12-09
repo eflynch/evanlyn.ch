@@ -9,11 +9,23 @@ h1 {
 a {
     text-decoration: none;
     font-weight: bold;
-    color: gray;
+    cursor: pointer;
 }
 
 a:hover {
     color: black;
+}
+
+div.iframe-link {
+    color: #64AD27;
+}
+
+div.iframe-link:hover{
+    color: #448D07;
+}
+
+div.normal {
+    color: #1C8173;
 }
 
 body {
@@ -141,7 +153,6 @@ input:focus {
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce_bottom {
-    color: #1C8173;
     z-index: 0;
     min-width: 100px;
     min-height: 22px;

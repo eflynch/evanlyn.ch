@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --content-base app/",
-    "build": "webpack -p"
+    "build": "webpack -p",
+    "deploy": "./deploy.sh"
   },
   "author": "Evan Lynch",
   "license": "ISC",

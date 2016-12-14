@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function (){
             var initHead = undefined;
         }
         render(<Magnolial initTrunk={trunk} initHead={initHead} onUpdate={function(trunk, head, focus){
-            console.log(head);
             window.location.hash = head;
         }} onBlur={function(e){}}j/>, content);
     });

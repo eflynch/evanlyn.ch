@@ -12,7 +12,6 @@ class Breadcrumbs extends React.PureComponent {
         var breadcrumbs = this.props.ancestors.map(function(parent){
             var onClick = function (e){
                 this.props.setHead(parent);
-                this.props.setFocus(parent);
             }.bind(this);
             if (!parent.value.title){
                 var text = '...';

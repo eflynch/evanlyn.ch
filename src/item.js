@@ -90,6 +90,7 @@ class Item extends React.Component {
                                onKeyDown={this.onKeyDown}
                                setTitle={this.props.setTitle}
                                setFocus={this.props.setFocus}
+                               setHead={this.setHead}
                                entryEnabled={this.props.entryEnabled}
                                hasFocus={this.props.hasFocus}/>
                     </rb.Row>

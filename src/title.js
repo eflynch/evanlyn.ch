@@ -56,6 +56,14 @@ class Title extends React.Component {
         placeCaretAtEnd(ReactDOM.findDOMNode(this.refs.input));
     }
 
+    onClick (e){
+        if (!e.metaKey){
+            this.props.setHead();
+            this.props.setFocus(this.props.trunk);
+            e.preventDefault();
+        }
+    }
+
     setValue (e){
         if (e.target.value !== this.props.trunk.value.title){
             this.props.setTitle(this.props.trunk, e.target.value);
@@ -71,7 +79,7 @@ class Title extends React.Component {
             className += ' MAGNOLIAL_focused';
         }
         return (
-            <div className="MAGNOLIAL_ce_wrapper">
+            <div className="MAGNOLIAL_ce_wrapper" onClick={this.onClick.bind(this)}>
                 <ContentEditable className={className + " MAGNOLIAL_ce_bottom"}
                                  ref="bottom"
                                  html={this.props.trunk.value.title}

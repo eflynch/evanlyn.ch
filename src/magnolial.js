@@ -70,7 +70,6 @@ class ContentIFrame extends React.Component {
     }
     onLoad (e) {
         var iframe = ReactDOM.findDOMNode(this.refs.iframe);
-        console.log("focusing:", iframe);
         iframe.focus();
         iframe.contentWindow.document.body.onkeydown = function (e){
             if (e.key === "Escape"){
@@ -133,10 +132,8 @@ class Magnolial extends React.Component {
     componentWillUpdate(nextProps, nextState){
         if (nextState.focusSerial === null && this.state.focusCapture){
             if (nextState.headSerial !== this.state.headSerial){
-                console.log("Focusing head from null");
                 this.setFocus(this.t.node_hash[nextState.headSerial]);
             } else {
-                console.log("Focusing last focus from null");
                 this.setFocus(this.t.node_hash[this.state.focusSerial]);
             }
         }
@@ -478,7 +475,6 @@ class Magnolial extends React.Component {
         }
         return (
             <rb.Grid className="MAGNOLIAL" onBlur={this.onBlur} onFocus={this.onFocus} onKeyDown={function(e){
-                console.log("key registerted");
                 this.keyDownHandler(e, focus);
             }.bind(this)}>
                 <rb.Row>

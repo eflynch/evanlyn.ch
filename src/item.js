@@ -9,9 +9,7 @@ class Item extends React.Component {
         super(props);
         this.genChildren = this.genChildren.bind(this);
         this.toggleCollapsed = this.toggleCollapsed.bind(this);
-        this.setHead = this.setHead.bind(this);
         this.onFocus = this.onFocus.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
     }
     shouldComponentUpdate(nextProps, nextState){
         if (this.props.trunk !== nextProps.trunk){
@@ -54,7 +52,6 @@ class Item extends React.Component {
                          focusAncestors={this.props.focusAncestors}
                          setHead={this.props.setHead}
                          setFocus={this.props.setFocus}
-                         keyDownHandler={this.props.keyDownHandler}
                          setCollapsed={this.props.setCollapsed}
                          entryEnabled={this.props.entryEnabled}
                          setTitle={this.props.setTitle}/>;
@@ -65,16 +62,8 @@ class Item extends React.Component {
         this.props.setCollapsed(this.props.trunk, !this.props.trunk.collapsed);
     }
 
-    setHead(){
-        this.props.setHead(this.props.trunk);
-    }
-
     onFocus(){
         this.props.setFocus(this.props.trunk);
-    }
-
-    onKeyDown(e){
-        this.props.keyDownHandler(e, this.props.trunk);
     }
 
     render(){
@@ -85,12 +74,11 @@ class Item extends React.Component {
                         <Decoration collapseable={this.props.trunk.childs.length > 0} 
                                     collapsed={this.props.trunk.collapsed}
                                     toggleCollapsed={this.toggleCollapsed}
-                                    setHead={this.setHead}/>
+                                    setHead={function(){this.props.setHead(this.props.trunk);}.bind(this)}/>
                         <Title trunk={this.props.trunk}
-                               onKeyDown={this.onKeyDown}
                                setTitle={this.props.setTitle}
                                setFocus={this.props.setFocus}
-                               setHead={this.setHead}
+                               setHead={this.props.setHead}
                                entryEnabled={this.props.entryEnabled}
                                hasFocus={this.props.hasFocus}/>
                     </rb.Row>

@@ -29,19 +29,21 @@ class Title extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.hasFocus){
-            var inputNode = ReactDOM.findDOMNode(this.refs.input);
-            if (document.activeElement !== inputNode){
-                inputNode.focus();
-            }
-        }
+        this.componentDidUpdate();
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.hasFocus){
-            var inputNode = ReactDOM.findDOMNode(this.refs.input);
-            if (document.activeElement !== inputNode){
-                inputNode.focus();
+            if(this.props.entryEnabled){
+                var inputNode = ReactDOM.findDOMNode(this.refs.input);
+                if (document.activeElement !== inputNode){
+                    inputNode.focus();
+                }
+            } else {
+                var bottomNode = ReactDOM.findDOMNode(this.refs.bottom);
+                if (document.activeElement !== bottomNode){
+                    bottomNode.focus();
+                }
             }
         }
     }
@@ -58,7 +60,7 @@ class Title extends React.Component {
 
     onClick (e){
         if (!e.metaKey){
-            this.props.setHead();
+            this.props.setHead(this.props.trunk);
             this.props.setFocus(this.props.trunk);
             e.preventDefault();
         }
@@ -79,14 +81,14 @@ class Title extends React.Component {
             className += ' MAGNOLIAL_focused';
         }
         return (
-            <div className="MAGNOLIAL_ce_wrapper" onClick={this.onClick.bind(this)}>
+            <div  className="MAGNOLIAL_ce_wrapper" onClick={this.onClick.bind(this)}>
                 <ContentEditable className={className + " MAGNOLIAL_ce_bottom"}
                                  ref="bottom"
+                                 tabIndex={-1}
                                  html={this.props.trunk.value.title}
                                  disabled={true}/>
                 <ContentEditable ref='input' className={className + " MAGNOLIAL_ce_top"}
                                  html={this.props.trunk.value.title}
-                                 onKeyDown={this.props.onKeyDown}
                                  onBlur={this.onBlur}
                                  onFocus={this.onFocus}
                                  onChange={this.setValue}/>

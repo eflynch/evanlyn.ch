@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Item from './item';
 import Breadcrumbs from './breadcrumbs';
 import ImmutableTree from './immutable-tree';
-import FocusTitle from './focus-title';
+import Title from './title';
 
 var rb = require('react-bootstrap');
 
@@ -66,11 +66,12 @@ function copyTextToClipboard(text) {
 
 class ContentIFrame extends React.Component {
     componentDidMount() {
-        var iframe = ReactDOM.findDOMNode(this.refs.iframe);
-        iframe.focus();
+        this.props.setFocusCapture(false);
     }
     onLoad (e) {
         var iframe = ReactDOM.findDOMNode(this.refs.iframe);
+        console.log("focusing:", iframe);
+        iframe.focus();
         iframe.contentWindow.document.body.onkeydown = function (e){
             if (e.key === "Escape"){
                 this.props.onEscape();
@@ -89,6 +90,7 @@ class Magnolial extends React.Component {
             trunk: {},
             headSerial: null,
             focusSerial: null,
+            focusCapture: true,
             MODE: 'vim-default'
         };
         this.initTrunk = this.initTrunk.bind(this);
@@ -96,6 +98,7 @@ class Magnolial extends React.Component {
         this.setContent = this.setContent.bind(this);
         this.setLink = this.setLink.bind(this);
         this.setFocus = this.setFocus.bind(this);
+        this.setFocusCapture = this.setFocusCapture.bind(this);
         this.setHead = this.setHead.bind(this);
         this.onBlur = this.onBlur.bind(this);
         this.setCollapsed = this.setCollapsed.bind(this);
@@ -128,10 +131,12 @@ class Magnolial extends React.Component {
         }
     }
     componentWillUpdate(nextProps, nextState){
-        if (nextState.focusSerial === null){
+        if (nextState.focusSerial === null && this.state.focusCapture){
             if (nextState.headSerial !== this.state.headSerial){
+                console.log("Focusing head from null");
                 this.setFocus(this.t.node_hash[nextState.headSerial]);
             } else {
+                console.log("Focusing last focus from null");
                 this.setFocus(this.t.node_hash[this.state.focusSerial]);
             }
         }
@@ -440,6 +445,9 @@ class Magnolial extends React.Component {
             focusSerial: child._serial
         });
     }
+    setFocusCapture(toggle){
+        this.setState({focusCapture: toggle});
+    }
     onBlur(e){
         this.setState({focusSerial: null});
         this.props.onBlur(e);
@@ -462,21 +470,29 @@ class Magnolial extends React.Component {
                          setTitle={this.setTitle}/>;
         }.bind(this));
         if (!items.length && head.value.content !== null){
-            items = <ContentIFrame src={head.value.content} onEscape={function(){
+            items = <ContentIFrame src={head.value.content} setFocusCapture={this.setFocusCapture} onEscape={function(){
+                this.setFocusCapture(true);
                 this.setHead(this.t.parentOf(head));
                 this.setFocus(head);
             }.bind(this)}/>;
         }
         return (
-            <rb.Grid className="MAGNOLIAL" onBlur={this.onBlur} onFocus={this.onFocus}>
+            <rb.Grid className="MAGNOLIAL" onBlur={this.onBlur} onFocus={this.onFocus} onKeyDown={function(e){
+                console.log("key registerted");
+                this.keyDownHandler(e, focus);
+            }.bind(this)}>
                 <rb.Row>
                     <rb.Col xs={12} lg={12}>
                         <Breadcrumbs setHead={this.setHead} setFocus={this.setFocus}
                                      ancestors={this.t.ancestorsOf(head)}/>
-                        <FocusTitle setTitle={this.setTitle} setFocus={this.setFocus}
-                                    hasFocus={focus === head} head={head}
-                                    keyDownHandler={this.keyDownHandler}
-                                    entryEnabled={this.state.MODE !== 'vim-default'}/>
+                        <h1>
+                            <Title trunk={head}
+                                   setTitle={this.setTitle}
+                                   setFocus={this.setFocus}
+                                   setHead={this.setHead}
+                                   entryEnabled={this.state.MODE !== 'vim-default'}
+                                   hasFocus={focus === head}/>
+                        </h1>
                     </rb.Col>
                 </rb.Row>
                 <rb.Row>

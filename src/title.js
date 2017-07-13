@@ -59,10 +59,10 @@ class Title extends React.Component {
     }
 
     onClick (e){
-        if (!e.metaKey){
+        this.props.setFocus(this.props.trunk);
+        e.preventDefault();
+        if (e.metaKey){
             this.props.setHead(this.props.trunk);
-            this.props.setFocus(this.props.trunk);
-            e.preventDefault();
         }
     }
 

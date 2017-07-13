@@ -8,66 +8,31 @@ import Title from './title';
 var rb = require('react-bootstrap');
 
 function copyTextToClipboard(text) {
-  var textArea = document.createElement("textarea");
-
-  //
-  // *** This styling is an extra step which is likely not required. ***
-  //
-  // Why is it here? To ensure:
-  // 1. the element is able to have focus and selection.
-  // 2. if element was to flash render it has minimal visual impact.
-  // 3. less flakyness with selection and copying which **might** occur if
-  //    the textarea element is not visible.
-  //
-  // The likelihood is the element won't even render, not even a flash,
-  // so some of these are just precautions. However in IE the element
-  // is visible whilst the popup box asking the user for permission for
-  // the web page to copy to the clipboard.
-  //
-
-  // Place in top-left corner of screen regardless of scroll position.
-  textArea.style.position = 'fixed';
-  textArea.style.top = 0;
-  textArea.style.left = 0;
-
-  // Ensure it has a small width and height. Setting to 1px / 1em
-  // doesn't work as this gives a negative w/h on some browsers.
-  textArea.style.width = '2em';
-  textArea.style.height = '2em';
-
-  // We don't need padding, reducing the size if it does flash render.
-  textArea.style.padding = 0;
-
-  // Clean up any borders.
-  textArea.style.border = 'none';
-  textArea.style.outline = 'none';
-  textArea.style.boxShadow = 'none';
-
-  // Avoid flash of white box if rendered for any reason.
-  textArea.style.background = 'transparent';
-
-
-  textArea.value = text;
-
-  document.body.appendChild(textArea);
-
-  textArea.select();
-
-  try {
-    var successful = document.execCommand('copy');
-    var msg = successful ? 'successful' : 'unsuccessful';
-    console.log('Copying text command was ' + msg);
-  } catch (err) {
-    console.log('Oops, unable to copy');
-  }
-
-  document.body.removeChild(textArea);
+    var textArea = document.createElement("textarea");
+    textArea.style.position = 'fixed';
+    textArea.style.top = 0;
+    textArea.style.left = 0;
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = 0;
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        console.log('Copying text command was ' + msg);
+    } catch (err) {
+        console.log('Oops, unable to copy');
+    }
+    document.body.removeChild(textArea);
 }
 
 class ContentIFrame extends React.Component {
-    componentDidMount() {
-        this.props.setFocusCapture(false);
-    }
     onLoad (e) {
         var iframe = ReactDOM.findDOMNode(this.refs.iframe);
         iframe.focus();
@@ -89,7 +54,6 @@ class Magnolial extends React.Component {
             trunk: {},
             headSerial: null,
             focusSerial: null,
-            focusCapture: true,
             MODE: 'vim-default'
         };
         this.initTrunk = this.initTrunk.bind(this);
@@ -97,7 +61,6 @@ class Magnolial extends React.Component {
         this.setContent = this.setContent.bind(this);
         this.setLink = this.setLink.bind(this);
         this.setFocus = this.setFocus.bind(this);
-        this.setFocusCapture = this.setFocusCapture.bind(this);
         this.setHead = this.setHead.bind(this);
         this.onBlur = this.onBlur.bind(this);
         this.setCollapsed = this.setCollapsed.bind(this);
@@ -119,7 +82,10 @@ class Magnolial extends React.Component {
 
             if (this.props.hasOwnProperty('initHead')){
                 if (this.t.node_hash[this.props.initHead] !== undefined){
-                    this.setState({headSerial: this.props.initHead});
+                    this.setState({
+                        headSerial: this.props.initHead,
+                        focusSerial: this.props.initHead
+                    });
                 }
             }
         }
@@ -130,7 +96,9 @@ class Magnolial extends React.Component {
         }
     }
     componentWillUpdate(nextProps, nextState){
-        if (nextState.focusSerial === null && this.state.focusCapture){
+        let content = this.t.node_hash[this.state.headSerial].value.content;
+        let focusCapture = content === null || content === undefined;
+        if (nextState.focusSerial === null && focusCapture){
             if (nextState.headSerial !== this.state.headSerial){
                 this.setFocus(this.t.node_hash[nextState.headSerial]);
             } else {
@@ -205,7 +173,7 @@ class Magnolial extends React.Component {
                 }
             }
         }
-        
+
         if (e.keyCode === 9){ // === 'Tab'){
             e.preventDefault();
             if (e.shiftKey){
@@ -217,13 +185,13 @@ class Magnolial extends React.Component {
         if (e.keyCode === 39){ // 'ArrowRight'){
             if (e.shiftKey){
                 e.preventDefault();
-                this.t.indentItem(child); 
+                this.t.indentItem(child);
             }
         }
         if (e.keyCode === 37){ // 'ArrowLeft'){
             if (e.shiftKey){
                 e.preventDefault();
-                this.t.outdentItem(child); 
+                this.t.outdentItem(child);
             }
         }
         if (e.keyCode === 38){  //'ArrowUp'){
@@ -256,7 +224,7 @@ class Magnolial extends React.Component {
         e.preventDefault();
         if (e.keyCode === 72){ // h
             if (e.shiftKey){
-                this.t.outdentItem(child); 
+                this.t.outdentItem(child);
             }
         }
         if (e.keyCode === 74){ // j
@@ -281,7 +249,7 @@ class Magnolial extends React.Component {
         }
         if (e.keyCode === 76){ // l
             if (e.shiftKey){
-                this.t.indentItem(child); 
+                this.t.indentItem(child);
             } else {
             }
         }
@@ -442,9 +410,6 @@ class Magnolial extends React.Component {
             focusSerial: child._serial
         });
     }
-    setFocusCapture(toggle){
-        this.setState({focusCapture: toggle});
-    }
     onBlur(e){
         this.setState({focusSerial: null});
         this.props.onBlur(e);
@@ -467,8 +432,7 @@ class Magnolial extends React.Component {
                          setTitle={this.setTitle}/>;
         }.bind(this));
         if (!items.length && head.value.content !== null){
-            items = <ContentIFrame src={head.value.content} setFocusCapture={this.setFocusCapture} onEscape={function(){
-                this.setFocusCapture(true);
+            items = <ContentIFrame src={head.value.content} onEscape={function(){
                 this.setHead(this.t.parentOf(head));
                 this.setFocus(head);
             }.bind(this)}/>;

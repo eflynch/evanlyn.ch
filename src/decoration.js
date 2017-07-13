@@ -5,9 +5,9 @@ import FontAwesome from 'react-fontawesome';
 class Decoration extends React.Component {
     onClick (e){
         if (e.metaKey){
-            this.props.toggleCollapsed();
-        } else {
             this.props.setHead();
+        } else {
+            this.props.toggleCollapsed();
         }
     }
 

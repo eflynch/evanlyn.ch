@@ -90,10 +90,10 @@ input:focus {
     vertical-align: top;
     display: inline-block;
     cursor: pointer;
-    -moz-user-select: none; 
-    -khtml-user-select: none; 
-    -webkit-user-select: none; 
-    -o-user-select: none; 
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
 }
 
 .MAGNOLIAL .MAGNOLIAL_decoration.MAGNOLIAL_completed {
@@ -175,16 +175,12 @@ input:focus {
     border-radius: 3px;
     padding-left: 4px;
     padding-right: 4px;
-    padding-top: 1px;
-    padding-bottom: 1px;
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_focused{
     color: #1A74CB;
     padding-left: 4px;
     padding-right: 4px;
-    padding-top: 1px;
-    padding-bottom: 1px;
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_completed {
@@ -210,7 +206,7 @@ input:focus {
     width: 350px;
 }
 
-.MAGNOLIAL h1 div.MAGNOLIAL_ce { 
+.MAGNOLIAL h1 div.MAGNOLIAL_ce {
     font-weight: 900;
     font-size: 22px;
     color: #F6E7BA!important;
@@ -223,6 +219,7 @@ input:focus {
 }
 
 .MAGNOLIAL_breadcrumb:hover {
+    color: #A09881
 }
 
 .MAGNOLIAL_breadcrumb_sym {

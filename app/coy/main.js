@@ -74,7 +74,7 @@ var _data = __webpack_require__(1);
 
 var _konopasStuff = __webpack_require__(2);
 
-window.signInRequired = true;
+window.apiType = "private";
 
 var parseAndRenderSchedule = function parseAndRenderSchedule(response) {
     var range = response.result;
@@ -87,14 +87,14 @@ var parseAndRenderSchedule = function parseAndRenderSchedule(response) {
 };
 
 window.onGoogleSignIn = function () {
-    if (window.signInRequired === false) {
+    if (window.apiType !== "private") {
         return;
     }
     (0, _data.getSchedule)().then(parseAndRenderSchedule);
 };
 
 window.handleClientLoad = function () {
-    if (window.signInRequired) {
+    if (window.apiType !== "public") {
         return;
     }
     (0, _data.loadAPI)(function () {
@@ -206,26 +206,27 @@ var konopify = function konopify(schedule) {
     var konopifyEvent = function konopifyEvent(event) {
         var dateTimeMins = parseDateTime(event.time);
         if (!dateTimeMins) {
-            console.warn("Ignoring Event:", event);
+            console.warn("Ignoring Event with bad dt:", event);
             return false;
         }
         var tags = [];
-        if (event.tags !== undefined) {
-            tags = event.tags.split(",");
-        }
-        if (event.language !== undefined && event.language !== "") {
-            tags.push("Language: " + event.language);
+        tags.push("room:" + event.room);
+        tags.push("category:" + event.tags);
+        var loc = [];
+        if (event.language !== undefined) {
+            loc = event.language.split(",");
         }
         var konopicEvent = {
             id: event.id,
             title: event.title,
             tags: tags,
             desc: event.description,
-            loc: [event.room],
+            loc: loc,
             people: [],
             organizer: event.organizer
         };
         Object.assign(konopicEvent, dateTimeMins);
+
         return konopicEvent;
     };
 
@@ -247,9 +248,21 @@ module.exports.renderSchedule = function (schedule) {
     });
     var program = konopify(schedule);
     window.konopas.set_program(program, {
-        'day': {},
-        'area': {},
-        'tag': {}
+        day: {},
+        area: {
+            labels: {
+                all_areas: 'All Languages',
+                area: 'Language'
+            }
+        },
+        tag: {
+            categories: ['room', 'category'],
+            labels: {
+                all_tags: 'All Rooms and Categories',
+                room: 'Room',
+                category: 'Category'
+            }
+        }
     });
     window.konopas.set_view();
 };

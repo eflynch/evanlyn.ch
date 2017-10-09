@@ -10,29 +10,35 @@
     <script src="konopas.min.js"></script>
     <script src="main.js"></script>
 
-    <!-- Google API Stuff For Private Sheet-->
     <meta name="google-signin-client_id" content="780719027012-6158h6h7gv9t98tir8tiss7ardqujle6.apps.googleusercontent.com">
 	<meta name="google-signin-scope" content="https://www.googleapis.com/auth/spreadsheets.readonly">
-	<!-- Google API Stuff for Public Sheet -->
     <script async defer src="https://apis.google.com/js/api.js"
             onload="this.onload=function(){};handleClientLoad()"
             onreadystatechange="if (this.readyState === 'complete') this.onload()">
     </script>
+    <script async defer src="https://apis.google.com/js/client:platform.js"></script>
 </head>
 <body>
-	<div id="googlestuff" style="position:fixed;z-index:10">
-		<p class="g-signin2" data-onsuccess="onGoogleSignIn"></p>
-	    <script src="https://apis.google.com/js/client:platform.js"></script>
-	    <a href="#" onclick="googleSignOut();">Sign out</a>
-	    <script>
-	      function googleSignOut() {
-	        var auth2 = gapi.auth2.getAuthInstance();
-	        auth2.signOut().then(function () {
-	          console.log('User signed out.');
-	        });
-	      }
-	    </script>
-	</div>
+	<div id="googlestuff" style="position:fixed;z-index:10"></div>
+	<script>
+		if (window.apiType === "private"){
+			let googlestuff = document.getElementById("googlestuff");
+
+			let signIn = document.createElement("P");
+			signIn.className = "g-signin2";
+			signIn.setAttribute("data-onsuccess", "onGoogleSignIn");
+			googlestuff.appendChild(signIn);
+
+			let signOut = document.createElement("A");
+			signOut.href = "#";
+			signOut.id = "google-sign-out-button";
+			signOut.style = "display:none;";
+			signOut.setAttribute("onclick", "googleSignOut();")
+			signOut.innerText = "Sign out";
+			googlestuff.appendChild(signOut);
+		}
+	</script>
+
     <div id="top"></div>
 	<div id="load_disable"></div>
 	<div id="time"></div>

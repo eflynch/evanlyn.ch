@@ -249,17 +249,22 @@ KonOpas.Item.new = function(it) {
 		}
 		return s;
 	}
-	var frame = _new_elem('div', 'item_frame'),
-	    star  = frame.appendChild(_new_elem('div', 'item_star')),
-	    item  = frame.appendChild(_new_elem('div', 'item')),
-	    title = item.appendChild(_new_elem('div', 'title')),
-	    loc   = item.appendChild(_new_elem('div', 'loc'));
+	var frame = _new_elem('div', 'item_frame');
+	var star  = frame.appendChild(_new_elem('div', 'item_star'));
+	var item  = frame.appendChild(_new_elem('div', 'item'));
+	var title = item.appendChild(_new_elem('div', 'title'));
+	// Hack to add Organizer element
+	var org = item.appendChild(_new_elem('div', 'organizer'))
+	var loc   = item.appendChild(_new_elem('div', 'loc'));
+
+	
 
 	KonOpas.Item.new = function(it) {
 		star.id = 's' + it.id;
 		item.id = 'p' + it.id;
 		title.textContent = it.title;
 		loc.textContent = _loc_str(it);
+		org.textContent = it.organizer;
 		return frame.cloneNode(true);
 	};
 	return KonOpas.Item.new(it);
@@ -1150,6 +1155,10 @@ KonOpas.Prog.prototype.init_filters = function(opt) {
 		    root = document.createElement('li'),
 		    link = _new_elem('div', 'popup-link', title + '…'),
 		    ul = _new_elem('ul', 'popup');
+		// Hack: To remove Room category listing
+		if (konopas.hiddenFilterCategories.indexOf(title) !== -1){
+			root.style="display:none";
+		}
 		link.setAttribute('data-title', link.textContent);
 		link.addEventListener('click', KonOpas.popup_open);
 		ul.id = id;

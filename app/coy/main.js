@@ -76,8 +76,7 @@ var _konopasStuff = __webpack_require__(2);
 
 window.apiType = "private";
 
-var parseAndRenderSchedule = function parseAndRenderSchedule(response) {
-    var range = response.result;
+var parseAndRenderSchedule = function parseAndRenderSchedule(range) {
     var header = range.values[0].map(function (x) {
         return x.toLowerCase();
     });
@@ -90,7 +89,15 @@ window.onGoogleSignIn = function () {
     if (window.apiType !== "private") {
         return;
     }
-    (0, _data.getSchedule)().then(parseAndRenderSchedule);
+    document.getElementById("google-sign-out-button").style = "display:inline";
+    (0, _data.getSchedule)().then(function (response) {
+        parseAndRenderSchedule(response.result);
+    });
+};
+
+window.googleSignOut = function () {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut();
 };
 
 window.handleClientLoad = function () {
@@ -98,9 +105,20 @@ window.handleClientLoad = function () {
         return;
     }
     (0, _data.loadAPI)(function () {
-        (0, _data.getPublicSchedule)().then(parseAndRenderSchedule);
+        (0, _data.getPublicSchedule)().then(function (response) {
+            parseAndRenderSchedule(response.result);
+        });
     });
 };
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.apiType !== "static") {
+        return;
+    }
+    (0, _data.getJSON)("test-data.json", function (range) {
+        parseAndRenderSchedule(range);
+    });
+});
 
 /***/ }),
 /* 1 */
@@ -114,7 +132,7 @@ var CLIENT_ID = "780719027012-6158h6h7gv9t98tir8tiss7ardqujle6.apps.googleuserco
 var SPREADSHEET_ID = "1vicwHDowugLkBAO2DyD5ccVInhLbMr8tODhpSnLl04A";
 var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
 var SPREADSHEET = "Kopie von Copy of Schedule Web Data (Don't Edit This)";
-var RANGE = SPREADSHEET + "!A1:J300";
+var RANGE = SPREADSHEET + "!A1:K300";
 
 module.exports.getParser = function (header) {
     return function (row) {
@@ -137,7 +155,7 @@ module.exports.getParser = function (header) {
 module.exports.getPublicSchedule = function () {
     return gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: SPREADSHEET + "!A1:J300"
+        range: RANGE
     });
 };
 
@@ -156,6 +174,26 @@ module.exports.getSchedule = function () {
         root: 'https://sheets.googleapis.com/',
         method: 'GET'
     });
+};
+
+module.exports.getJSON = function (url, successHandler, errorHandler) {
+    var xhr = typeof XMLHttpRequest != 'undefined' ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+    xhr.open('get', url, true);
+    xhr.onreadystatechange = function () {
+        var status = void 0;
+        var data = void 0;
+        if (xhr.readyState == 4) {
+            // `DONE`
+            status = xhr.status;
+            if (status == 200) {
+                data = JSON.parse(xhr.responseText);
+                successHandler && successHandler(data);
+            } else {
+                errorHandler && errorHandler(status);
+            }
+        }
+    };
+    xhr.send();
 };
 
 /***/ }),
@@ -203,15 +241,51 @@ var konopify = function konopify(schedule) {
         };
     };
 
-    var konopifyEvent = function konopifyEvent(event) {
+    var validateEvent = function validateEvent(event) {
         var dateTimeMins = parseDateTime(event.time);
         if (!dateTimeMins) {
             console.warn("Ignoring Event with bad dt:", event);
             return false;
         }
+
+        if (event.format === undefined) {
+            console.warn("Ignoring Event with bad format:", event);
+            return false;
+        }
+
+        if (event.area === undefined) {
+            console.warn("Ignoring Event with bad area:", event);
+            return false;
+        }
+
+        if (event.topic === undefined) {
+            console.warn("Ignoring Event with bad topic:", event);
+            return false;
+        }
+
+        return true;
+    };
+
+    var konopifyEvent = function konopifyEvent(event) {
+        if (!validateEvent(event)) {
+            return false;
+        }
+
+        var dateTimeMins = parseDateTime(event.time);
         var tags = [];
         tags.push("room:" + event.room);
-        tags.push("category:" + event.tags);
+        event.format.split(",").forEach(function (tag) {
+            if (tag) tags.push("format:" + tag);
+        });
+        event.area.split(",").forEach(function (tag) {
+            if (tag) tags.push("area:" + tag);
+        });
+        event.topic.split(",").forEach(function (tag) {
+            if (tag) tags.push("topic:" + tag);
+        });
+        if (event.isspecial) {
+            tags.push("special");
+        }
         var loc = [];
         if (event.language !== undefined) {
             loc = event.language.split(",");
@@ -246,6 +320,7 @@ module.exports.renderSchedule = function (schedule) {
         'show_all_days_by_default': true,
         'use_server': false
     });
+    window.konopas.hiddenFilterCategories = ["Room"];
     var program = konopify(schedule);
     window.konopas.set_program(program, {
         day: {},
@@ -256,12 +331,16 @@ module.exports.renderSchedule = function (schedule) {
             }
         },
         tag: {
-            categories: ['room', 'category'],
+            categories: ['room', 'format', 'area', 'topic', 'special'], // There is a hack in place to hide the room filter
             labels: {
-                all_tags: 'All Rooms and Categories',
+                all_tags: 'All Categories',
                 room: 'Room',
-                category: 'Category'
-            }
+                format: 'Format',
+                area: 'Area',
+                topic: 'Topic',
+                special: 'General'
+            },
+            promote: ['special']
         }
     });
     window.konopas.set_view();

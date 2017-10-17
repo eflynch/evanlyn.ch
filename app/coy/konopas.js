@@ -233,10 +233,42 @@ KonOpas.Item.show_extra = function(item, id) {
 	var extra = _new_elem('div', 'extra');
 	extra.id = 'e' + id;
 	extra.innerHTML = html;
+
+	var cal = _new_elem('div', 'callink');
+	cal.onclick = function(e){
+		var c = window.ics(uuid());
+		var starttime = new Date(a[0].date + " " + a[0].time + " GMT+1");
+		var endtime = new Date(a[0].date + "T" + a[0].time + " GMT+1");
+		c.addEvent(a[0].title, a[0].desc, a[0].room, starttime, endtime);
+		c.download("coy13-event");
+		e.stopPropagation();
+	}
+	extra.appendChild(cal);
 	item.appendChild(extra);
 }
 
 KonOpas.Item.new = function(it) {
+// This function is horrible... why is it..
+
+// namespace.functionName = function(data){
+    
+//     var state = new State();
+
+//     namespace.functionName = function(data){
+//         mutate(state); 			// mutate must be idempotent
+//         return copy(state);
+//     }
+//     return functionName(data);
+// }
+
+// instead of...
+
+// namespace.functionName = function(data){
+//     var state = new State();
+//     mutate(state) 			// mutate must be idempotent
+//     return state;
+// }
+
 	function _loc_str(it) {
 		var s = '';
 		if (it.loc && it.loc.length) {
@@ -265,6 +297,15 @@ KonOpas.Item.new = function(it) {
 		title.textContent = it.title;
 		loc.textContent = _loc_str(it);
 		org.textContent = it.organizer;
+
+		// You have to assign it both ways because we are modifying
+		// a single node that is closured in each time we call this
+		// function before cloning it... This is horrible.
+		if (it.isspecial){
+			frame.className = "item_frame special";
+		} else {
+			frame.className = "item_frame";
+		}
 		return frame.cloneNode(true);
 	};
 	return KonOpas.Item.new(it);

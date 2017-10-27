@@ -71,7 +71,7 @@ function KonOpas(set) {
 	this.use_server = false;
 	this.log_messages = true;
 	this.cache_refresh_interval_mins = 60;
-	this.views = [ "star", "prog", "part", "info" ];
+	this.views = [ "star", "prog", "part", "info", "fram" ];
 	if (typeof set == 'object') for (var i in set) this[i] = set[i];
 
 	if (!this.log_messages) _log = function(){};
@@ -88,6 +88,7 @@ function KonOpas(set) {
 	this.server = this.use_server && KonOpas.Server && new KonOpas.Server(this.id, this.stars);
 	this.item = new KonOpas.Item();
 	this.info = new KonOpas.Info();
+	this.fram = new KonOpas.Fram();
 	window.onhashchange = this.set_view.bind(this);
 	var pl = document.getElementsByClassName('popup-link');
 	for (var i = 0; i < pl.length; ++i) pl[i].addEventListener('click', KonOpas.popup_open);
@@ -116,6 +117,7 @@ KonOpas.prototype.set_view = function() {
 			case 'part': this.people.show();  break;
 			case 'star': this.stars.show();   break;
 			case 'info': this.info.show();    break;
+			case 'fram': this.fram.show();    break;
 			default:     this.program.show(); view = 'prog';
 		}
 	}
@@ -139,6 +141,13 @@ KonOpas.prototype.refresh_cache = function() {
 		window.setInterval(function() { cache.update(); }, t_interval);
 	}
 }
+KonOpas.Fram = function() {
+}
+
+KonOpas.Fram.prototype.show = function() {
+    _el("prog_ls").innerHTML = "";
+}
+
 KonOpas.Info = function() {
 	this.lu = _el('last-updated');
 	this.lu_time = 0;
@@ -273,7 +282,7 @@ KonOpas.Item.new = function(it) {
 		var s = '';
 		if (it.loc && it.loc.length) {
 			s = it.loc[0];
-			if (it.loc.length > 1) s += ' (' + it.loc.slice(1).join(', ') + ')';
+			if (it.loc.length > 1) s += ', ' + it.loc.slice(1).join(', ');
 		}
 		if (it.mins && (it.mins != konopas.default_duration)) {
 			if (s) s += ', ';

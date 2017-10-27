@@ -59,6 +59,7 @@
 			<li id="tab_star"><a href="#star" data-txt>Starred</a>
 			<li id="tab_prog"><a href="#" data-txt>Program</a><div id="day-sidebar" class="sub-side"></div>
 			<li id="tab_info"><a href="#info" data-txt>Info</a>
+			<li id="tab_fram"><a href="#fram" data-txt>Overview</a>
 		</ul>
 
 		<div id="refresh">
@@ -98,24 +99,15 @@
 		</div>
 
 		<div id="info_view" class="view">
-			<p>Welcome to the programme guide for <a href="http://coy13.org/">COY13</a> made with <a href="http://konopas.org/">KonOpas</a>, an open-source project providing conventions with easy-to-use mobile-friendly guides.
-
-			<p><div id="last-updated">Programme and participant data were last updated <span></span>.</div>
-
-			<div id="install-instructions">
-				<p>This guide will work in your browser even when you don't have an internet connection.
-				<h4 class="collapse">You can also install it as a home screen app</h4>
-				<dl class="compact-dl">
-					<dt>Safari on iPhone/iPad<dd>Tap on <i class="ios_share_icon"></i> (share), then tap <b>Add to Home Screen</b>.
-					<dt>Chrome on Android<dd>Tap on <i class="android_menu_icon"></i> (menu), then tap <b>Add to Home Screen</b>.
-					<dt>Firefox on Android<dd>Tap on <i class="android_menu_icon"></i> (menu), then tap <b>Bookmark</b> and select <b>Options</b>, and <b>Add to Home Screen</b>.
-					<dt>IE on Windows Phone<dd>Tap on <i class="ie_menu_icon"></i> (menu), then tap <b>Pin to Start</b>
-				</dl>
-			</div>
-			<script>
-				if (navigator.standalone) document.getElementById('install-instructions').style.display = 'none';
-			</script>
+			<div id="info_view_react_container" />
 		</div>
+		<div id="fram_view" class="view">
+			<h2>Overview of Schedule</h2>
+			<img src="Day1_final.png"/>
+			<img src="Day2_final.png"/>
+			<img src="Day3_finalB.png"/>
+		</div>
+
 
 		<div id="prog_ls" class="ls">
 			<br>

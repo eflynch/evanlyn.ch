@@ -71,7 +71,7 @@ function KonOpas(set) {
 	this.use_server = false;
 	this.log_messages = true;
 	this.cache_refresh_interval_mins = 60;
-	this.views = [ "star", "prog", "part", "info", "fram" ];
+	this.views = [ "star", "prog", "part", "info", "fram", "map" ];
 	if (typeof set == 'object') for (var i in set) this[i] = set[i];
 
 	if (!this.log_messages) _log = function(){};
@@ -89,6 +89,7 @@ function KonOpas(set) {
 	this.item = new KonOpas.Item();
 	this.info = new KonOpas.Info();
 	this.fram = new KonOpas.Fram();
+	this.map = new KonOpas.Map();
 	window.onhashchange = this.set_view.bind(this);
 	var pl = document.getElementsByClassName('popup-link');
 	for (var i = 0; i < pl.length; ++i) pl[i].addEventListener('click', KonOpas.popup_open);
@@ -118,6 +119,7 @@ KonOpas.prototype.set_view = function() {
 			case 'star': this.stars.show();   break;
 			case 'info': this.info.show();    break;
 			case 'fram': this.fram.show();    break;
+			case 'map': this.map.show();    break;
 			default:     this.program.show(); view = 'prog';
 		}
 	}
@@ -546,6 +548,13 @@ KonOpas.Item.prototype.scroll_time = function() {
 	}
 	if (S.s_el) S.s_el.style.display = S.t_el.style.display;
 }
+KonOpas.Map = function() {
+}
+
+KonOpas.Map.prototype.show = function() {
+    _el("prog_ls").innerHTML = "";
+}
+
 KonOpas.Part = function(list, opt) {
 	this.list = list || [];
 	this.list.forEach(function(p){
@@ -1207,7 +1216,7 @@ KonOpas.Prog.prototype.init_filters = function(opt) {
 		    ul = _new_elem('ul', 'popup');
 		// Hack: To remove Room category listing
 		if (konopas.hiddenFilterCategories.indexOf(title) !== -1){
-			root.style="display:none";
+			root.className += "hackhidden";
 		}
 		link.setAttribute('data-title', link.textContent);
 		link.addEventListener('click', KonOpas.popup_open);

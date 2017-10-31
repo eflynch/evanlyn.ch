@@ -23,14 +23,14 @@
 	<div id="googlestuff" style="position:fixed;z-index:10"></div>
 	<script>
 		if (window.apiType === "private"){
-			let googlestuff = document.getElementById("googlestuff");
+			var googlestuff = document.getElementById("googlestuff");
 
-			let signIn = document.createElement("P");
+			var signIn = document.createElement("P");
 			signIn.className = "g-signin2";
 			signIn.setAttribute("data-onsuccess", "onGoogleSignIn");
 			googlestuff.appendChild(signIn);
 
-			let signOut = document.createElement("A");
+			var signOut = document.createElement("A");
 			signOut.href = "#";
 			signOut.id = "google-sign-out-button";
 			signOut.style = "display:none;";
@@ -60,6 +60,7 @@
 			<li id="tab_prog"><a href="#" data-txt>Program</a><div id="day-sidebar" class="sub-side"></div>
 			<li id="tab_info"><a href="#info" data-txt>Info</a>
 			<li id="tab_fram"><a href="#fram" data-txt>Overview</a>
+			<li id="tab_map"><a href="#map" data-txt>Map</a>
 		</ul>
 
 		<div id="refresh">
@@ -99,13 +100,21 @@
 		</div>
 
 		<div id="info_view" class="view">
-			<div id="info_view_react_container" />
+			<div id="info_view_react_container"></div>
 		</div>
+
 		<div id="fram_view" class="view">
 			<h2>Overview of Schedule</h2>
 			<img src="Day1_final.png"/>
 			<img src="Day2_final.png"/>
 			<img src="Day3_finalB.png"/>
+		</div>
+
+		<div id="map_view" class="view">
+			<h2>Roomplan</h2>
+			<img src="plan1.png"/>
+			<img src="plan2.png"/>
+			<img src="plan3.png"/>
 		</div>
 
 

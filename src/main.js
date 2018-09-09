@@ -46,7 +46,10 @@ var initMagnolial = function(trunk){
     render(<Magnolial initTrunk={trunk} initHead={initHead} onUpdate={function(trunk, head, focus){
         respond_to_hashchange = false;
         window.location.hash = head;
+        window.localStorage.setItem('trunk', JSON.stringify(trunk));
     }} onBlur={function(e){}}/>, content);
+    window.onhashchange = onhashchange;
+    window.localStorage.setItem('trunk', JSON.stringify(trunk));
 }
 
 var reloadMagnolial = function (headSerial){
@@ -58,8 +61,12 @@ var reloadMagnolial = function (headSerial){
 }
 
 document.addEventListener("DOMContentLoaded", function (){
-    window.onhashchange = onhashchange;
-    getJSON("trunk.mgl", function(trunk){
-        initMagnolial(trunk);
-    });
+    var data = JSON.parse(window.localStorage.getItem('trunk'));
+    if (data !== undefined){
+        initMagnolial(data);
+    } else {
+        getJSON("trunk.mgl", function(trunk){
+            initMagnolial(trunk);
+        });
+    }
 });

@@ -67,6 +67,8 @@ class Item extends React.Component {
     }
 
     render(){
+        let hasContent = this.props.trunk.value.content !== null && this.props.trunk.value.content !== undefined;
+        let hasLink = this.props.trunk.value.link !== null && this.props.trunk.value.link !== undefined;
         var listItem = (
             <li>
                 <rb.Col lg={12}>
@@ -79,7 +81,11 @@ class Item extends React.Component {
                                setTitle={this.props.setTitle}
                                setFocus={this.props.setFocus}
                                setHead={this.props.setHead}
+                               collapseable={this.props.trunk.childs.length > 0}
+                               toggleCollapsed={this.toggleCollapsed}
                                entryEnabled={this.props.entryEnabled}
+                               hasContent={hasContent}
+                               hasLink={hasLink}
                                hasFocus={this.props.hasFocus}/>
                     </rb.Row>
                     <rb.Row className="MAGNOLIAL_list">
@@ -91,10 +97,10 @@ class Item extends React.Component {
             </li>
         );
 
-        if (this.props.trunk.value.link !== null && this.props.trunk.value.link !== undefined){
-            return <a href={this.props.trunk.value.link}>{listItem}</a>;
+        if (hasLink){
+            return <div className="link">{listItem}</div>;
         } 
-        if (this.props.trunk.value.content !== null && this.props.trunk.value.content !== undefined){
+        if (hasContent){
             return <div className="iframe-link">{listItem}</div>;
         }
         return <div className="normal">{listItem}</div>;

@@ -63,6 +63,14 @@ class Title extends React.Component {
         e.preventDefault();
         if (e.metaKey){
             this.props.setHead(this.props.trunk);
+            return;
+        }
+        if (this.props.collapseable){
+            this.props.toggleCollapsed();
+        } else if (this.props.hasContent) {
+            this.props.setHead(this.props.trunk);
+        } else if (this.props.hasLink) {
+            window.location = this.props.trunk.value.link;
         }
     }
 

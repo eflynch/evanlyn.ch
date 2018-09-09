@@ -6,16 +6,6 @@ h1 {
     margin:0;
 }
 
-a {
-    text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-a:hover {
-    color: black;
-}
-
 div.iframe-link {
     color: #64AD27;
 }
@@ -26,6 +16,15 @@ div.iframe-link:hover{
 
 div.normal {
     color: #1C8173;
+}
+
+div.link {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+div.link:hover {
+    color: #135a97;
 }
 
 body {

@@ -35,12 +35,13 @@ function copyTextToClipboard(text) {
 class ContentIFrame extends React.Component {
     onLoad (e) {
         var iframe = ReactDOM.findDOMNode(this.refs.iframe);
-        iframe.focus();
+        iframe.contentWindow.focus();
         iframe.contentWindow.document.body.onkeydown = function (e){
             if (e.key === "Escape"){
                 this.props.onEscape();
             }
         }.bind(this);
+        iframe.contentWindow.focus();
     }
     render () {
         return <iframe onLoad={this.onLoad.bind(this)} ref="iframe" src={this.props.src} />

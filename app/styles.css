@@ -174,10 +174,13 @@ input:focus {
     outline: none;
     border: none;
     padding: 0;
+    padding-left: 4px;
+    padding-right: 4px;
     margin: 0;
     font-weight: 500;
     font-size: 22px;
     font-family: monospace;
+    min-height: 31.4333px;
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce_bottom.MAGNOLIAL_focused {
@@ -189,8 +192,6 @@ input:focus {
 
 .MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_focused{
     color: #1A74CB;
-    padding-left: 4px;
-    padding-right: 4px;
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_completed {

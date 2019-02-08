@@ -62,11 +62,17 @@ var reloadMagnolial = function (headSerial){
 
 document.addEventListener("DOMContentLoaded", function (){
     var data = JSON.parse(window.localStorage.getItem('trunk'));
-    if (data !== undefined){
+    if (data !== undefined && data !== null){
         initMagnolial(data);
     } else {
         getJSON("trunk.mgl", function(trunk){
             initMagnolial(trunk);
         });
     }
+
+    let divTag = document.getElementById("reset");
+    divTag.onclick = (e) => {
+        window.localStorage.removeItem("trunk");
+        window.location = "/";
+    };
 });

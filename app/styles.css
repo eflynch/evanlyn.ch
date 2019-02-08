@@ -27,6 +27,17 @@ div.link:hover {
     color: #135a97;
 }
 
+div#reset {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+}
+
+div#reset:hover {
+    color:#807861;
+    cursor:pointer;
+}
+
 body {
     background-color: black !important;
 }

@@ -105,7 +105,7 @@ class Magnolial extends React.Component {
         }
     }
     componentWillUpdate(nextProps, nextState){
-        let content = this.t.node_hash[this.state.headSerial].value.content;
+        const content = this.t.node_hash[this.state.headSerial].value.content;
         let focusCapture = content === null || content === undefined;
         if (nextState.focusSerial === null && focusCapture){
             if (nextState.headSerial !== this.state.headSerial){
@@ -114,10 +114,16 @@ class Magnolial extends React.Component {
                 this.setFocus(this.t.node_hash[this.state.focusSerial]);
             }
         }
+        const head = this.t.node_hash[nextState.headSerial];
+        if (head.childs.length === 0 && this.t.parentOf(head) !== undefined){
+            this.setHead(this.t.parentOf(head));
+            this.setFocus(head);
+        }
+        this.props.onUpdate(nextState.trunk, nextState.headSerial, nextState.focusSerial);
     }
+
     initTrunk(initTrunk){
         this.t = new ImmutableTree(initTrunk, function (trunk){
-            this.props.onUpdate(trunk, this.state.headSerial, this.state.focusSerial);
             this.setState({trunk: trunk});
         }.bind(this), {title: "", content: null, link: null});
         this.setState({
@@ -126,6 +132,7 @@ class Magnolial extends React.Component {
             focusSerial: this.t.getTrunk()._serial
         });
     }
+
     // Mutators
     setTitle(child, title){
         return this.t.setValue(child, {
@@ -356,8 +363,13 @@ class Magnolial extends React.Component {
             }
             e.preventDefault();
             if (child.value.title === ''){
-                if (!this.t.outdentItem(child)){
+                var head = this.t.node_hash[this.state.headSerial];
+                if (head === this.t.parentOf(child)){
                     this.setFocus(this.t.newItemBelow(child));
+                } else {
+                    if (!this.t.outdentItem(child)){
+                        this.setFocus(this.t.newItemBelow(child));
+                    }
                 }
             } else {
                 this.setFocus(this.t.newItemBelow(child));
@@ -399,8 +411,6 @@ class Magnolial extends React.Component {
             return;
         }
 
-        this.props.onUpdate(this.state.trunk, child._serial, this.state.focusSerial);
-        // this.t.setCollapsed(child, false);
         this.setState({
             headSerial: child._serial,
             focusSerial: child._serial

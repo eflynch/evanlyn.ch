@@ -73,10 +73,14 @@ class Item extends React.Component {
             <li>
                 <rb.Col lg={12}>
                     <rb.Row onFocus={this.onFocus}>
-                        <Decoration collapseable={this.props.trunk.childs.length > 0} 
+                        <Decoration trunk={this.props.trunk}
+                                    collapseable={this.props.trunk.childs.length > 0} 
                                     collapsed={this.props.trunk.collapsed}
                                     toggleCollapsed={this.toggleCollapsed}
-                                    setHead={function(){this.props.setHead(this.props.trunk);}.bind(this)}/>
+                                    hasContent={hasContent}
+                                    hasLink={hasLink}
+                                    setHead={this.props.setHead}
+                                    setFocus={this.props.setFocus}/>
                         <Title trunk={this.props.trunk}
                                setTitle={this.props.setTitle}
                                setFocus={this.props.setFocus}

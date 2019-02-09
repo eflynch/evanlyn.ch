@@ -223,6 +223,9 @@ class ImmutableTree {
     setValue(child, value){
         if (child.value === value){return;}
         var hash = this.generateHash(child);
+        if (value.title !== undefined && value.title === "<br>"){
+            value.title = "";
+        }
         hash.target.value = {$set: value};
         this.applyHash(hash);
     }

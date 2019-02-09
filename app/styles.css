@@ -29,13 +29,20 @@ div.link:hover {
 
 div#reset {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    top: 50px;
+    left: 30px;
 }
 
 div#reset:hover {
     color:#807861;
     cursor:pointer;
+}
+
+div#whose {
+    cursor:pointer;
+    position: fixed;
+    top: 30px;
+    left: 30px;
 }
 
 body {

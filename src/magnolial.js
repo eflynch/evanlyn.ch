@@ -92,8 +92,16 @@ class Magnolial extends React.Component {
         }
     }
     componentWillReceiveProps(nextProps) {
+        if (nextProps.hasOwnProperty('initTrunk')){
+            this.initTrunk(nextProps.initTrunk);
+        }
         if (nextProps.hasOwnProperty('initHead')){
-            this.setState({headSerial: nextProps.initHead});
+            if (this.t.node_hash[nextProps.initHead] !== undefined){
+                this.setState({
+                    headSerial: nextProps.initHead,
+                    focusSerial: nextProps.initHead
+                });
+            }
         }
     }
     componentWillUpdate(nextProps, nextState){

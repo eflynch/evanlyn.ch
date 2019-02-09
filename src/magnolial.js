@@ -119,7 +119,7 @@ class Magnolial extends React.Component {
             this.setHead(this.t.parentOf(head));
             this.setFocus(head);
         }
-        this.props.onUpdate(nextState.trunk, nextState.headSerial, nextState.focusSerial);
+        nextProps.onUpdate(nextState.trunk, nextState.headSerial, nextState.focusSerial);
     }
 
     initTrunk(initTrunk){

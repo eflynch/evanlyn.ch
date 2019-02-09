@@ -29,7 +29,7 @@ div.link:hover {
 
 div#reset {
     position: fixed;
-    top: 50px;
+    bottom: 30px;
     left: 30px;
 }
 
@@ -41,7 +41,7 @@ div#reset:hover {
 div#whose {
     cursor:pointer;
     position: fixed;
-    top: 30px;
+    bottom: 50px;
     left: 30px;
 }
 

@@ -80,8 +80,9 @@ var loadPage = () => {
 
 document.addEventListener("DOMContentLoaded", function (){
     var whoseItNow = window.localStorage.getItem('whose');
-    if (whoseItNow === "mine" && whoseItNow === "yours"){
+    if (whoseItNow !== "mine" && whoseItNow !== "yours"){
         window.localStorage.setItem('whose', 'mine');
+        whoseItNow = 'mine';
     }
 
     let whoseTag = document.getElementById("whose");

@@ -115,7 +115,7 @@ class Magnolial extends React.Component {
             }
         }
         const head = this.t.node_hash[nextState.headSerial];
-        if (head.childs.length === 0 && this.t.parentOf(head) !== undefined){
+        if (head.content === null && head.childs.length === 0 && this.t.parentOf(head) !== undefined){
             this.setHead(this.t.parentOf(head));
             this.setFocus(head);
         }

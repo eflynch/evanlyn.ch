@@ -12,7 +12,7 @@ var config = {
         filename: 'main.js'
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.jsx?/,
                 include: APP_DIR,
@@ -29,3 +29,4 @@ var config = {
 };
 
 module.exports = config;
+

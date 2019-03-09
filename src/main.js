@@ -47,6 +47,9 @@ var initMagnolial = function(trunk, saveMethod){
 
     renderMagnolial();
     window.onhashchange = (e) => {
+        if (!window.location.hash.startsWith("#")){
+            return;
+        }
         if (respond_to_hashchange){
             renderMagnolial();
         }

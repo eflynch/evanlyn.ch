@@ -1,3 +1,5 @@
+#!/bin/bash
+
 rsync app/* eflynch.github.io/
 cd eflynch.github.io
 git add --all

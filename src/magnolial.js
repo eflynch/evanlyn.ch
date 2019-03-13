@@ -464,14 +464,14 @@ class Magnolial extends React.Component {
                     <rb.Col xs={12} lg={12}>
                         <Breadcrumbs setHead={this.setHead} setFocus={this.setFocus}
                                      ancestors={this.t.ancestorsOf(head)}/>
-                        <h1>
+                        <div className="title">
                             <Title trunk={head}
                                    setTitle={this.setTitle}
                                    setFocus={this.setFocus}
                                    setHead={this.setHead}
                                    entryEnabled={this.state.MODE !== 'vim-default'}
                                    hasFocus={focus === head}/>
-                        </h1>
+                        </div>
                     </rb.Col>
                 </rb.Row>
                 <rb.Row>

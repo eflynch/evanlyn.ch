@@ -2,10 +2,6 @@ body {
     font-family: monospace;
 }
 
-h1 {
-    margin:0;
-}
-
 div.iframe-link {
     color: #64AD27;
 }
@@ -215,16 +211,16 @@ input:focus {
     color:transparent!important;
 }
 
-.MAGNOLIAL h2 {
+.MAGNOLIAL div.breadcrumb-wrapper {
     margin: 0;
     padding-bottom: 10px;
     font-size: 22px;
     display: inline-block;
 }
 
-.MAGNOLIAL h1 {
-    padding-bottom: 10px;
+.MAGNOLIAL div.title {
     margin: 0;
+    padding-bottom: 10px;
     display: inline-block;
     width: 350px;
 }
@@ -235,17 +231,17 @@ input:focus {
     color: #F6E7BA!important;
 }
 
-.MAGNOLIAL_breadcrumb {
+.MAGNOLIAL .breadcrumb-text {
     font-weight: 100;
     color: #807861;
     cursor: pointer;
 }
 
-.MAGNOLIAL_breadcrumb:hover {
+.MAGNOLIAL .breadcrumb-text:hover {
     color: #A09881
 }
 
-.MAGNOLIAL_breadcrumb_sym {
+.MAGNOLIAL .breadcrumb-sym {
     font-weight: 100;
     padding-left: 5px;
     padding-right: 5px;

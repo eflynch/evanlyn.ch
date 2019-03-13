@@ -25,17 +25,17 @@ class Breadcrumbs extends React.PureComponent {
             }
             return (
                 <span key={parent._serial}>
-                    <span className="MAGNOLIAL_breadcrumb" onClick={onClick}>
+                    <span className="breadcrumb-text" onClick={onClick}>
                         {text}
                     </span>
-                    <span className="MAGNOLIAL_breadcrumb_sym">‣</span>
+                    <span className="breadcrumb-sym">‣</span>
                 </span>
             );
         }.bind(this));
         return (
-            <h2>
+            <div className="breadcrumb-wrapper">
                 {breadcrumbs}
-            </h2>
+            </div>
         );
     }   
 }

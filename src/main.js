@@ -27,8 +27,6 @@ var getJSON = function(url, successHandler, errorHandler) {
     xhr.send();
 };
 
-var respond_to_hashchange = true;
-
 var initMagnolial = function(trunk, saveMethod){
     const content = document.getElementById("content");
 
@@ -39,23 +37,17 @@ var initMagnolial = function(trunk, saveMethod){
             var initHead = undefined;
         }
         render(<Magnolial initTrunk={trunk} initHead={initHead} onUpdate={function(trunk, head, focus){
-            respond_to_hashchange = false;
-            window.location.hash = head;
+            if (window.location.hash !== "#"+head){
+                window.history.pushState(null, null, "#"+head);
+            }
             saveMethod(trunk);
         }} onBlur={function(e){}}/>, content);
     }
 
     renderMagnolial();
-    window.onhashchange = (e) => {
-        if (!window.location.hash.startsWith("#")){
-            return;
-        }
-        if (respond_to_hashchange){
-            renderMagnolial();
-        }
-        respond_to_hashchange = true;
+    window.onpopstate = (e) => {
+        renderMagnolial();
     };
-    respond_to_hashchange = true;
     saveMethod(trunk);
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Item from './item';
 import Breadcrumbs from './breadcrumbs';
-import ImmutableTree from './immutable-tree';
+import {OutdentItem, IndentItem, MoveItemUp, Undo, Redo, CreateTrunkCache, GetTrunk, ParentOf, SetValue, SetCollapsed, AncestorsOf, DeleteItem, NewItemAbove, NewItemBelow, MoveItemDown, SuccOf, PredOf} from '../immutable-tree';
 import Title from './title';
 
 var rb = require('react-bootstrap');
@@ -82,7 +82,7 @@ class Magnolial extends React.Component {
             this.initTrunk(this.props.initTrunk);
 
             if (this.props.hasOwnProperty('initHead')){
-                if (this.t.node_hash[this.props.initHead] !== undefined){
+                if (GetTrunk(this.props.initHead, this.t) !== undefined){
                     this.setState({
                         headSerial: this.props.initHead,
                         focusSerial: this.props.initHead
@@ -96,7 +96,7 @@ class Magnolial extends React.Component {
             this.initTrunk(nextProps.initTrunk);
         }
         if (nextProps.hasOwnProperty('initHead')){
-            if (this.t.node_hash[nextProps.initHead] !== undefined){
+            if (GetTrunk(nextProps.initHead, this.t) !== undefined){
                 this.setState({
                     headSerial: nextProps.initHead,
                     focusSerial: nextProps.initHead
@@ -105,58 +105,61 @@ class Magnolial extends React.Component {
         }
     }
     componentWillUpdate(nextProps, nextState){
-        const content = this.t.node_hash[this.state.headSerial].value.content;
+        const content = GetTrunk(this.state.headSerial, this.t).value.content;
         let focusCapture = content === null || content === undefined;
         if (nextState.focusSerial === null && focusCapture){
             if (nextState.headSerial !== this.state.headSerial){
-                this.setFocus(this.t.node_hash[nextState.headSerial]);
+                this.setFocus(GetTrunk(nextState.headSerial, this.t));
             } else {
-                this.setFocus(this.t.node_hash[this.state.focusSerial]);
+                this.setFocus(GetTrunk(this.state.focusSerial, this.t));
             }
         }
-        const head = this.t.node_hash[nextState.headSerial];
-        if (head.content === null && head.childs.length === 0 && this.t.parentOf(head) !== undefined){
-            this.setHead(this.t.parentOf(head));
-            this.setFocus(head);
+        const head = GetTrunk(nextState.headSerial, this.t);
+        if (head.content === null && head.childs.length === 0) {
+            const parent = ParentOf(head, this.t);
+            if (parent !== undefined){
+                this.setHead(parent);
+                this.setFocus(head);
+            }
         }
         nextProps.onUpdate(nextState.trunk, nextState.headSerial, nextState.focusSerial);
     }
 
     initTrunk(initTrunk){
-        this.t = new ImmutableTree(initTrunk, function (trunk){
+        this.t = CreateTrunkCache(initTrunk, function (trunk){
             this.setState({trunk: trunk});
         }.bind(this), {title: "", content: null, link: null});
         this.setState({
-            trunk: this.t.getTrunk(),
-            headSerial: this.t.getTrunk()._serial,
-            focusSerial: this.t.getTrunk()._serial
+            trunk: this.t.current,
+            headSerial: this.t.current._serial,
+            focusSerial: this.t.current._serial
         });
     }
 
     // Mutators
     setTitle(child, title){
-        return this.t.setValue(child, {
+        return SetValue(child, this.t, {
             title: title,
             content: child.value.content,
             link: child.value.link
         });
     }
     setContent(child, content){
-        return this.t.setValue(child, {
+        return SetValue(child, this.t, {
             title: child.value.title,
             content: content,
             link: child.value.link
         });
     }
     setLink(child, link){
-        return this.t.setValue(child, {
+        return SetValue(child, this.t, {
             title: child.value.title,
             content: child.value.content,
             link: link
         });
     }
     setCollapsed(child, state){
-        return this.t.setCollapsed(child, state);
+        return SetCollapsed(child, this.t, state);
     }
     keyDownHandler(e, child){
         switch (this.state.MODE){
@@ -179,13 +182,13 @@ class Magnolial extends React.Component {
         if (e.keyCode === 8){ // === 'Backspace'){
             if (e.shiftKey){
                 e.preventDefault();
-                this.setFocus(this.t.predOf(child));
-                this.t.deleteItem(child);
+                this.setFocus(PredOf(child, this.t));
+                DeleteItem(child, this.t);
             } else {
                 if (child.value.title === '' && child.childs.length === 0){
                     e.preventDefault();
-                    this.setFocus(this.t.predOf(child));
-                    this.t.deleteItem(child);
+                    this.setFocus(PredOf(child, this.t));
+                    DeleteItem(child, this.t);
                 }
             }
         }
@@ -193,42 +196,42 @@ class Magnolial extends React.Component {
         if (e.keyCode === 9){ // === 'Tab'){
             e.preventDefault();
             if (e.shiftKey){
-                this.t.outdentItem(child);
+                OutdentItem(child, this.t);
             } else {
-                this.t.indentItem(child);
+                IndentItem(child, this.t);
             }
         }
         if (e.keyCode === 39){ // 'ArrowRight'){
             if (e.shiftKey){
                 e.preventDefault();
-                this.t.indentItem(child);
+                IndentItem(child, this.t);
             }
         }
         if (e.keyCode === 37){ // 'ArrowLeft'){
             if (e.shiftKey){
                 e.preventDefault();
-                this.t.outdentItem(child);
+                OutdentItem(child, this.t);
             }
         }
         if (e.keyCode === 38){  //'ArrowUp'){
             e.preventDefault();
             if (e.shiftKey){
-                this.t.moveItemUp(child);
+                MoveItemUp(child, this.t);
             } else {
-                this.setFocus(this.t.predOf(child));
+                this.setFocus(PredOf(child, this.t));
             }
         }
         if (e.keyCode === 40){ //'ArrowDown'){
             e.preventDefault();
             if (e.shiftKey){
-                if (!this.t.moveItemDown(child)){
-                    this.t.indentItem(child);
+                if (!MoveItemDown(child, this.t)){
+                    IndentItem(child, this.t);
                 }
             } else {
                 if (this.state.headSerial === child._serial){
                     this.setFocus(child.childs[0]);
                 } else {
-                    this.setFocus(this.t.succOf(child));
+                    this.setFocus(SuccOf(child, this.t));
                 }
             }
         }
@@ -240,50 +243,50 @@ class Magnolial extends React.Component {
         e.preventDefault();
         if (e.keyCode === 72){ // h
             if (e.shiftKey){
-                this.t.outdentItem(child);
+                OutdentItem(child, this.t);
             }
         }
         if (e.keyCode === 74){ // j
             if (e.shiftKey){
-                if (!this.t.moveItemDown(child)){
-                    this.t.indentItem(child);
+                if (!MoveItemDown(child, this.t)){
+                    IndentItem(child, this.t);
                 }
             } else {
                 if (this.state.headSerial === child._serial){
                     this.setFocus(child.childs[0]);
                 } else {
-                    this.setFocus(this.t.succOf(child));
+                    this.setFocus(SuccOf(child, this.t));
                 }
             }
         }
         if (e.keyCode === 75){ // k
             if (e.shiftKey){
-                this.t.moveItemUp(child);
+                MoveItemUp(child, this.t);
             } else {
-                this.setFocus(this.t.predOf(child));
+                this.setFocus(PredOf(child, this.t));
             }
         }
         if (e.keyCode === 76){ // l
             if (e.shiftKey){
-                this.t.indentItem(child);
+                IndentItem(child, this.t);
             } else {
             }
         }
         if (e.keyCode === 79){ // o
             if (e.shiftKey){
-                this.setFocus(this.t.newItemAbove(child));
+                this.setFocus(NewItemAbove(child, this.t));
                 this.setState({MODE: 'vim-input'});
             } else {
-                this.setFocus(this.t.newItemBelow(child));
+                this.setFocus(NewItemBelow(child, this.t));
                 this.setState({MODE: 'vim-input'});
             }
         }
         if (e.keyCode === 85){ // u
-            this.t.undo();
+            Undo(this.t);
         }
         if (e.keyCode === 87){ // w
             if (e.shiftKey){
-                copyTextToClipboard(JSON.stringify(this.t.getTrunk()));
+                copyTextToClipboard(JSON.stringify(this.t.current));
             }
         }
         if (e.keyCode === 69){ // e
@@ -297,7 +300,7 @@ class Magnolial extends React.Component {
             }
         }
         if (e.keyCode === 82){ // r
-            this.t.redo();
+            Redo(this.t);
         }
         if (e.keyCode === 73){ // i
             this.setState({MODE: 'vim-input'});
@@ -309,13 +312,13 @@ class Magnolial extends React.Component {
             this.setState({MODE: 'vim-input'});
         }
         if (e.keyCode === 68){ // d
-            var head = this.t.node_hash[this.state.headSerial];
+            const head = GetTrunk(this.state.headSerial, this.t);
             if (head === child){
                 return;
             }
             if (e.shiftKey){
-                this.setFocus(this.t.predOf(child));
-                this.t.deleteItem(child);
+                this.setFocus(PredOf(child, this.t));
+                DeleteItem(child, this.t);
             }
         }
         if (e.keyCode === 32){ // space
@@ -329,11 +332,11 @@ class Magnolial extends React.Component {
         }
         if (e.keyCode === 188){ // <
             e.preventDefault();
-            var head = this.t.node_hash[this.state.headSerial];
+            var head = GetTrunk(this.state.headSerial, this.t);
             if (head === this.state.trunk){
                 return;
             }
-            this.setHead(this.t.parentOf(head));
+            this.setHead(ParentOf(head, this.t));
             this.setFocus(head);
         }
         if (e.keyCode === 13){ // === 'Enter'){
@@ -343,11 +346,11 @@ class Magnolial extends React.Component {
         }
         if (e.keyCode === 27){ //'Escape'){
             e.preventDefault();
-            var head = this.t.node_hash[this.state.headSerial];
+            var head = GetTrunk(this.state.headSerial, this.t);
             if (head === this.state.trunk){
                 return;
             }
-            this.setHead(this.t.parentOf(head));
+            this.setHead(ParentOf(head, this.t));
             this.setFocus(head);
         }
     }
@@ -363,16 +366,16 @@ class Magnolial extends React.Component {
             }
             e.preventDefault();
             if (child.value.title === ''){
-                var head = this.t.node_hash[this.state.headSerial];
-                if (head === this.t.parentOf(child)){
-                    this.setFocus(this.t.newItemBelow(child));
+                var head = GetTrunk(this.state.headSerial, this.t);
+                if (head === ParentOf(child, this.t)){
+                    this.setFocus(NewItemBelow(child, this.t));
                 } else {
                     if (!this.t.outdentItem(child)){
-                        this.setFocus(this.t.newItemBelow(child));
+                        this.setFocus(NewItemBelow(child, this.t));
                     }
                 }
             } else {
-                this.setFocus(this.t.newItemBelow(child));
+                this.setFocus(NewItemBelow(child, this.t));
             }
         }
     }
@@ -392,12 +395,12 @@ class Magnolial extends React.Component {
                     this.setFocus(child.childs[0]);
                 }
             } else {
-                var head = this.t.node_hash[this.state.headSerial];
+                var head = (this.state.headSerial, this.t);
                 if (head === this.state.trunk){
                     return;
                 }
-                this.setHead(this.t.parentOf(head));
-                this.setFocus(this.t.parentOf(head));
+                this.setHead(ParentOf(head, this.t));
+                this.setFocus(ParentOf(head, this.t));
             }
         }
     }
@@ -421,7 +424,7 @@ class Magnolial extends React.Component {
             return;
         }
         if (child._serial !== this.state.headSerial){
-            if (this.t.ancestorsOf(child).indexOf(this.t.node_hash[this.state.headSerial]) < 0){
+            if (AncestorsOf(child, this.t).indexOf(GetTrunk(this.state.headSerial, this.t)) < 0) {
                 return;
             }
         }
@@ -435,13 +438,13 @@ class Magnolial extends React.Component {
     }
     // Render
     render(){
-        var head = this.t.node_hash[this.state.headSerial];
-        var focus = this.t.node_hash[this.state.focusSerial];
+        var head = GetTrunk(this.state.headSerial, this.t);
+        var focus = GetTrunk(this.state.focusSerial, this.t);
         var items = head.childs.map(function(child, i){
             return <Item trunk={child}
                          key={child._serial}
                          focus={focus}
-                         focusAncestors={this.t.ancestorsOf(focus)}
+                         focusAncestors={AncestorsOf(focus, this.t)}
                          setHead={this.setHead}
                          setFocus={this.setFocus}
                          keyDownHandler={this.keyDownHandler}
@@ -452,7 +455,7 @@ class Magnolial extends React.Component {
         }.bind(this));
         if (!items.length && head.value.content !== null){
             items = <ContentIFrame src={head.value.content} onEscape={function(){
-                this.setHead(this.t.parentOf(head));
+                this.setHead(ParentOf(head,this.t));
                 this.setFocus(head);
             }.bind(this)}/>;
         }
@@ -463,7 +466,7 @@ class Magnolial extends React.Component {
                 <rb.Row>
                     <rb.Col xs={12} lg={12}>
                         <Breadcrumbs setHead={this.setHead} setFocus={this.setFocus}
-                                     ancestors={this.t.ancestorsOf(head)}/>
+                                     ancestors={AncestorsOf(head, this.t)}/>
                         <div className="title">
                             <Title trunk={head}
                                    setTitle={this.setTitle}
@@ -484,4 +487,5 @@ class Magnolial extends React.Component {
     }
 }
 
-module.exports = Magnolial;
+export default Magnolial;
+

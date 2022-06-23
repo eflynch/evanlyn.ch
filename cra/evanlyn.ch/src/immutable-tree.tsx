@@ -1,17 +1,16 @@
 import update from 'immutability-helper';
-import { stringify } from 'querystring';
 
-type Trunk {
-    childs: [Trunk]|[],
+export type Trunk = {
+    childs: [Trunk?],
     value: any,
     collapsed: boolean,
     _serial?: string,
     _parent?: string|null,
 };
 
-type TrunkCache {
-    undos: [Trunk]|[],
-    redos: [Trunk]|[],
+export type TrunkCache = {
+    undos: [Trunk?],
+    redos: [Trunk?],
     current: Trunk,
     nodeHash: Map<string, Trunk>,
     onMutate: (newTrunk: Trunk)=>void,
@@ -49,7 +48,7 @@ function formatTrunk(trunk:Trunk, createBaseValue:()=>any):Map<string, Trunk>{
         }
         nodeHash.set(child._serial, child);
         for (var i=0; i < child.childs.length; i++){
-            formatChild(child.childs[i], child._serial);
+            formatChild(child.childs[i] as Trunk, child._serial);
         }
     };
     formatChild(trunk, null);
@@ -86,26 +85,30 @@ export function CreateTrunkCache(trunk:Trunk, onMutate:(newTrunk: Trunk)=>void, 
     };
 };
 
+export function GetTrunk(serial:string, trunkCache:TrunkCache) {
+    return trunkCache.nodeHash.get(serial);
+}
+
+
 function fixNodeHash(trunk:Trunk, nodeHash:Map<string, Trunk>){
     if (trunk._serial && trunk === nodeHash.get(trunk._serial as string)) {
         return;
     }
     nodeHash.set(trunk._serial as string, trunk);
     trunk.childs.forEach((child) => {
-        fixNodeHash(child, nodeHash);
+        fixNodeHash(child as Trunk, nodeHash);
     });
 };
 
-function generateHash(target:Trunk){
-    var parents = ancestorsOf(target);
+function generateHash(target:Trunk, nodeHash:Map<string, Trunk>){
+    let parents = ancestorsOf(target, nodeHash);
     parents.push(target);
-    var hash:any = {};
-    var iter:any = hash;
-    var previousParent;
+    let hash:any = {};
+    let iter:any = hash;
     for (var i=1; i < parents.length; i++){
-        var previousParent = parents[i-1];
-        var parent = parents[i];
-        var parentIdx = previousParent.childs.indexOf(parent);
+        let previousParent = parents[i-1] as Trunk;
+        let parent = parents[i];
+        let parentIdx = previousParent.childs.indexOf(parent);
         var newHash = {};
         iter.childs = {
             [parentIdx]: newHash
@@ -125,25 +128,25 @@ function applyHash(trunkCache:TrunkCache, hash:any){
     if (trunkCache.undos.length > 10){
         trunkCache.undos.pop();
     }
-    (trunkCache.undos as [Trunk]).unshift(trunkCache.current);
+    trunkCache.undos.unshift(trunkCache.current);
     trunkCache.redos = [];
     trunkCache.current = newTrunk;
 };
 
-function undo(trunkCache:TrunkCache){
+export function Undo(trunkCache:TrunkCache){
     if (trunkCache.undos.length){
         if (trunkCache.redos.length > 10){
             trunkCache.redos.pop();
         }
-        (trunkCache.redos as [Trunk]).unshift(trunkCache.current);
-        var newTrunk = trunkCache.undos.shift();
+        trunkCache.redos.unshift(trunkCache.current);
+        let newTrunk = trunkCache.undos.shift();
         fixNodeHash(newTrunk as Trunk, trunkCache.nodeHash);
         trunkCache.onMutate(newTrunk as Trunk);
         trunkCache.current = newTrunk as Trunk;
     }
 };
 
-function redo(trunkCache:TrunkCache){
+export function Redo(trunkCache:TrunkCache){
     if (trunkCache.redos.length){
         var newTrunk = trunkCache.redos.shift();
         fixNodeHash(newTrunk as Trunk, trunkCache.nodeHash);
@@ -151,243 +154,256 @@ function redo(trunkCache:TrunkCache){
         if (trunkCache.undos.length > 10){
             trunkCache.undos.pop();
         }
-        (trunkCache.undos as [Trunk]).unshift(trunkCache.current as Trunk);
+        trunkCache.undos.unshift(trunkCache.current as Trunk);
         trunkCache.current = newTrunk as Trunk;
     }
 };
 
-function ancestorsOf(target:Trunk|undefined){
+function ancestorsOf(target:Trunk|undefined, nodeHash:Map<string, Trunk>):[Trunk?]{
     if (target === undefined){
         return [];
     }
-    var ancestors = [];
-    var parent = parentOf(target);
+    let ancestors = [] as [Trunk?];
+    let parent = parentOf(target, nodeHash) as Trunk;
     while (parent !== undefined){
-        ancestors.unshift(parent);
-        parent = parentOf(parent);
+        ancestors.unshift(parent as Trunk);
+        parent = parentOf(parent as Trunk, nodeHash) as Trunk;
     }
     return ancestors;
+};
+
+export function AncestorsOf(child:Trunk, trunkCache:TrunkCache):[Trunk?] {
+    return ancestorsOf(child, trunkCache.nodeHash);
 }
 
-    parentOf(child){
-        if (child._parent === undefined){
-            return undefined;
+function parentOf(child:Trunk, nodeHash:Map<string, Trunk>):Trunk|undefined{
+    if (child._parent === undefined){
+        return undefined;
+    }
+    return nodeHash.get(child._parent as string);
+}
+
+export function ParentOf(child:Trunk, trunkCache:TrunkCache):Trunk|undefined {
+    return parentOf(child, trunkCache.nodeHash);
+}
+
+export function PredOf(child:Trunk, trunkCache:TrunkCache):Trunk|undefined{
+    if (child === trunkCache.current){
+        return undefined;
+    }
+    if (indexOf(child, trunkCache.nodeHash) === 0){
+        return parentOf(child, trunkCache.nodeHash);
+    }
+    const lowestOpenLeaf = function (trunk:Trunk):Trunk{
+        if (trunk.collapsed || trunk.childs.length === 0){
+            return trunk;
         }
-        return this.nodeHash[child._parent];
+        return lowestOpenLeaf(trunk.childs[trunk.childs.length - 1] as Trunk);
+    }
+    return lowestOpenLeaf((parentOf(child, trunkCache.nodeHash) as Trunk).childs[indexOf(child, trunkCache.nodeHash) - 1] as Trunk);
+};
+
+export function SuccOf(child:Trunk, trunkCache:TrunkCache):Trunk|undefined{
+    if (!child.collapsed && child.childs.length > 0){
+        return child.childs[0];
     }
 
-    predOf(child){
-        if (child === this.trunk){
-            return undefined;
-        }
-        if (this.indexOf(child) === 0){
-            return this.parentOf(child);
-        }
-        var lowestOpenLeaf = function (trunk){
-            if (trunk.collapsed || trunk.childs.length === 0){
-                return trunk;
-            }
-            return lowestOpenLeaf(trunk.childs[trunk.childs.length - 1]);
-        }
-        return lowestOpenLeaf(this.parentOf(child).childs[this.indexOf(child) - 1]);
-
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+    if (childIdx < (parentOf(child, trunkCache.nodeHash) as Trunk).childs.length - 1){
+        return (parentOf(child, trunkCache.nodeHash) as Trunk).childs[childIdx + 1];
     }
 
-    succOf(child){
-        if (!child.collapsed && child.childs.length > 0){
-            return child.childs[0];
+    const findIt = function (trunk:Trunk):Trunk|undefined{
+        if (trunk === trunkCache.current){
+            return undefined;
         }
-
-        var childIdx = this.indexOf(child);
-        if (childIdx < this.parentOf(child).childs.length - 1){
-            return this.parentOf(child).childs[childIdx + 1];
+        const parent = parentOf(trunk, trunkCache.nodeHash);
+        const childIdx = indexOf(trunk, trunkCache.nodeHash);
+        if (parent && childIdx < parent.childs.length - 1){
+            return parent.childs[childIdx + 1];
         }
-
-        var findIt = function (trunk){
-            if (trunk === this.trunk){
-                return undefined;
-            }
-            var parent = this.parentOf(trunk);
-            var childIdx = this.indexOf(trunk);
-            if (childIdx < parent.childs.length - 1){
-                return parent.childs[childIdx + 1];
-            }
-
+        if (parent) {
             return findIt(parent);
-        }.bind(this);
-        return findIt(this.parentOf(child));
-
-    }
-
-    indexOf(child){
-        if (child._parent === undefined){return 0;}
-        return this.parentOf(child).childs.indexOf(child);
-    }
-
-    getTrunk(){
-        return this.trunk;
-    }
-
-    setCollapsed(child, state){
-        var hash = this.generateHash(child);
-        hash.target.collapsed = {$set: state};
-        this.applyHash(hash);
-    }
-
-    setValue(child, value){
-        if (child.value === value){return;}
-        var hash = this.generateHash(child);
-        if (value.title !== undefined && value.title === "<br>"){
-            value.title = "";
         }
-        hash.target.value = {$set: value};
-        this.applyHash(hash);
-    }
-
-
-    newItemBelow(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-
-        var childIdx = this.indexOf(child);
-        var newItem = ImmutableTree.makeChild(child._parent);
-        newItem.value = this.createBaseValue();
-        this.nodeHash[newItem._serial] = newItem;
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {$splice: [[childIdx + 1, 0, newItem]]};
-        this.applyHash(hash);
-        return newItem;
-    }
-
-    newItemAbove(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-
-        var childIdx = this.indexOf(child);
-        var newItem = ImmutableTree.makeChild(child._parent);
-        newItem.value = this.createBaseValue();
-        this.nodeHash[newItem._serial] = newItem;
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {$splice: [[childIdx, 0, newItem]]};
-        this.applyHash(hash);
-        return newItem;
-    }
-
-    deleteItem(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-        if (this.parentOf(child) === this.trunk && this.trunk.childs.length === 1){
-            return false;
-        }
-        var childIdx = this.indexOf(child);
-
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {$splice: [[childIdx, 1]]};
-        this.applyHash(hash);
-
-        return true;
-    }
-
-    indentItem(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-        // Ignore if First Child
-        var childIdx = this.indexOf(child);
-        if (childIdx === 0){
-            return false;
-        }
-
-        var newChild = update(child, {_parent: {$set: this.parentOf(child).childs[childIdx - 1]._serial}});
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {
-            $splice: [[childIdx,1]],
-            [childIdx - 1]: {
-                childs: {$push: [newChild]},
-                collapsed: {$set: false}
-            },
-        };
-        this.applyHash(hash);
-
-        return true;
-    }
-
-    outdentItem(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-
-        // Ignore if Child of Trunk
-        if (this.parentOf(child) === this.trunk){
-            return false;
-        }
-
-        var parentIdx = this.indexOf(this.parentOf(child));
-        var childIdx = this.indexOf(child);
-
-        var newChild = update(child, {_parent: {$set: this.parentOf(this.parentOf(child))._serial}});
-
-        var hash = this.generateHash(this.parentOf(this.parentOf(child)));
-        hash.target.childs = {
-            $splice: [[parentIdx + 1, 0, newChild]],
-            [parentIdx]: {
-                childs: {$splice: [[childIdx,1]]}
-            }
-        };
-        this.applyHash(hash);
-
-        return true;
-    }
-
-    moveItemUp(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-
-        var childIdx = this.indexOf(child);
-
-        // Ignore if top Child
-        if (childIdx === 0){
-            return false;
-        }
-
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {
-            $splice: [[childIdx, 1], [childIdx - 1, 0, child]]
-        }
-        this.applyHash(hash);
-        return true;
-    }
-
-    moveItemDown(child){
-        // Ignore if Trunk
-        if (child === this.trunk){
-            return false;
-        }
-
-        var childIdx = this.indexOf(child);
-
-        // Ignore if bottom Child
-        if (childIdx === this.parentOf(child).childs.length - 1){
-            return false;
-        }
-
-        var hash = this.generateHash(this.parentOf(child));
-        hash.target.childs = {
-            $splice: [[childIdx, 1], [childIdx + 1, 0, child]]
-        }
-        this.applyHash(hash);
-        return true;
-    }
+        return undefined;
+    };
+    const parent = parentOf(child, trunkCache.nodeHash);
+    if (parent) { return findIt(parent);}
+    return undefined;
 }
 
-module.exports = ImmutableTree;
+function indexOf(child:Trunk, nodeHash:Map<string, Trunk>):number{
+    if (child._parent === undefined){return 0;}
+    return (parentOf(child, nodeHash) as Trunk).childs.indexOf(child);
+}
+
+export function SetCollapsed(child:Trunk, trunkCache:TrunkCache, state:boolean){
+    var hash = generateHash(child, trunkCache.nodeHash);
+    hash.target.collapsed = {$set: state};
+    applyHash(trunkCache, hash);
+}
+
+export function SetValue(child:Trunk, trunkCache:TrunkCache, value:any){
+    if (child.value === value){return;}
+    let hash = generateHash(child, trunkCache.nodeHash);
+    if (value.title !== undefined && value.title === "<br>"){
+        value.title = "";
+    }
+    hash.target.value = {$set: value};
+    applyHash(trunkCache, hash);
+}
+
+
+export function NewItemBelow(child:Trunk, trunkCache:TrunkCache):boolean|Trunk{
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+    let newItem = makeChild(child._parent as string);
+    newItem.value = trunkCache.createBaseValue();
+    trunkCache.nodeHash.set(newItem._serial as string, newItem);
+    var hash = generateHash(parentOf(child, trunkCache.nodeHash) as Trunk, trunkCache.nodeHash);
+    hash.target.childs = {$splice: [[childIdx + 1, 0, newItem]]};
+    applyHash(trunkCache, hash);
+    return newItem;
+}
+
+export function NewItemAbove(child:Trunk, trunkCache:TrunkCache):boolean|Trunk {
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+    let newItem = makeChild(child._parent as string);
+    newItem.value = trunkCache.createBaseValue();
+    trunkCache.nodeHash.set(newItem._serial as string, newItem);
+    var hash = generateHash(parentOf(child, trunkCache.nodeHash) as Trunk, trunkCache.nodeHash);
+    hash.target.childs = {$splice: [[childIdx, 0, newItem]]};
+    applyHash(trunkCache, hash);
+    return newItem;
+}
+
+export function DeleteItem(child:Trunk, trunkCache:TrunkCache):boolean {
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    if (parentOf(child, trunkCache.nodeHash) === trunkCache.current && trunkCache.current.childs.length === 1){
+        return false;
+    }
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+
+    var hash = generateHash(parentOf(child, trunkCache.nodeHash) as Trunk, trunkCache.nodeHash);
+    hash.target.childs = {$splice: [[childIdx, 1]]};
+    applyHash(trunkCache, hash);
+
+    return true;
+}
+
+export function IndentItem(child:Trunk, trunkCache:TrunkCache):boolean|Trunk {
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+    // Ignore if First Child
+    var childIdx = indexOf(child, trunkCache.nodeHash);
+    if (childIdx === 0){
+        return false;
+    }
+
+    const parent = parentOf(child, trunkCache.nodeHash) as Trunk;
+    const newChild = update(
+        child,
+        {_parent: {
+            $set: (parent.childs[childIdx - 1] as Trunk)._serial as string}});
+    var hash = generateHash(parent, trunkCache.nodeHash);
+    hash.target.childs = {
+        $splice: [[childIdx,1]],
+        [childIdx - 1]: {
+            childs: {$push: [newChild]},
+            collapsed: {$set: false}
+        },
+    };
+    applyHash(trunkCache, hash);
+
+    return true;
+}
+
+export function OutdentItem(child:Trunk, trunkCache:TrunkCache):boolean{
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    // Ignore if Child of Trunk
+    if (parentOf(child, trunkCache.nodeHash) === trunkCache.current){
+        return false;
+    }
+
+    const parent = parentOf(child, trunkCache.nodeHash) as Trunk;
+    const parentIdx = indexOf(parent, trunkCache.nodeHash);
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+
+    const grandParent = parentOf(parent, trunkCache.nodeHash) as Trunk;
+
+    const newChild = update(child, {_parent: {$set: grandParent._serial as string}});
+
+    const hash = generateHash(grandParent, trunkCache.nodeHash);
+    hash.target.childs = {
+        $splice: [[parentIdx + 1, 0, newChild]],
+        [parentIdx]: {
+            childs: {$splice: [[childIdx,1]]}
+        }
+    };
+    applyHash(trunkCache, hash);
+
+    return true;
+}
+
+export function MoveItemUp(child:Trunk, trunkCache:TrunkCache):boolean{
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+
+    // Ignore if top Child
+    if (childIdx === 0){
+        return false;
+    }
+
+    let hash = generateHash(parentOf(child, trunkCache.nodeHash) as Trunk, trunkCache.nodeHash);
+    hash.target.childs = {
+        $splice: [[childIdx, 1], [childIdx - 1, 0, child]]
+    }
+    applyHash(trunkCache, hash);
+    return true;
+}
+
+export function MoveItemDown(child:Trunk, trunkCache:TrunkCache):boolean{
+    // Ignore if Trunk
+    if (child === trunkCache.current){
+        return false;
+    }
+
+    const parent = parentOf(child, trunkCache.nodeHash) as Trunk;
+    const childIdx = indexOf(child, trunkCache.nodeHash);
+
+    // Ignore if bottom Child
+    if (childIdx === parent.childs.length - 1){
+        return false;
+    }
+
+    const hash = generateHash(parent, trunkCache.nodeHash);
+
+    hash.target.childs = {
+        $splice: [[childIdx, 1], [childIdx + 1, 0, child]]
+    }
+    applyHash(trunkCache, hash);
+    return true;
+}

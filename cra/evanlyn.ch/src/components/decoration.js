@@ -34,4 +34,4 @@ class Decoration extends React.Component {
     }
 }
 
-module.exports = Decoration;
+export default Decoration;

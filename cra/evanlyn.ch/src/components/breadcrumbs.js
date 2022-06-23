@@ -40,4 +40,4 @@ class Breadcrumbs extends React.PureComponent {
     }   
 }
 
-module.exports = Breadcrumbs;
+export default Breadcrumbs;

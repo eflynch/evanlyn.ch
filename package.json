@@ -10,7 +10,6 @@
   },
   "author": "Evan Lynch",
   "license": "ISC",
-  "devDependencies": {},
   "dependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
@@ -18,14 +17,14 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "classnames": "^2.2.6",
-    "react": "^15.6.2",
+    "react": "18.2.0",
     "react-addons-update": "^15.6.2",
     "react-bootstrap": "^0.31.5",
-    "react-dom": "^15.6.2",
+    "react-dom": "18.2.0",
     "react-fontawesome": "^1.6.1",
-    "webpack": "^4.29.6",
+    "webpack": "4.46.0",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.1",
+    "webpack-dev-server": "4.9.2",
     "webpack-notifier": "^1.7.0"
   }
 }

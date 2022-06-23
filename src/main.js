@@ -2,7 +2,6 @@ import React from 'react';
 import {render} from 'react-dom';
 
 import Magnolial from './magnolial';
-import ImmutableTree from './immutable-tree';
 import Whose from './whose';
 
 var getJSON = function(url, successHandler, errorHandler) {

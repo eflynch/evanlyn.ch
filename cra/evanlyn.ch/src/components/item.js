@@ -111,4 +111,4 @@ class Item extends React.Component {
     }
 }
 
-module.exports = Item;
+export default Item;

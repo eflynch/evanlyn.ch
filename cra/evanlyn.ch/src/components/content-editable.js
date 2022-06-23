@@ -45,5 +45,4 @@ class ContentEditable extends React.Component {
     }
 }
 
-
-module.exports = ContentEditable;
+export default ContentEditable;

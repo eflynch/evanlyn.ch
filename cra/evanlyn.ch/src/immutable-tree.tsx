@@ -85,7 +85,10 @@ export function CreateTrunkCache(trunk:Trunk, onMutate:(newTrunk: Trunk)=>void, 
     };
 };
 
-export function GetTrunk(serial:string, trunkCache:TrunkCache) {
+export function GetTrunk(serial:string|undefined, trunkCache:TrunkCache) {
+    if (!serial){
+        return undefined;
+    }
     return trunkCache.nodeHash.get(serial);
 }
 
@@ -172,18 +175,21 @@ function ancestorsOf(target:Trunk|undefined, nodeHash:Map<string, Trunk>):[Trunk
     return ancestors;
 };
 
-export function AncestorsOf(child:Trunk, trunkCache:TrunkCache):[Trunk?] {
+export function AncestorsOf(child:Trunk|undefined, trunkCache:TrunkCache):[Trunk?] {
     return ancestorsOf(child, trunkCache.nodeHash);
 }
 
-function parentOf(child:Trunk, nodeHash:Map<string, Trunk>):Trunk|undefined{
+function parentOf(child:Trunk|undefined, nodeHash:Map<string, Trunk>):Trunk|undefined{
+    if (child === undefined) {
+        return undefined;
+    }
     if (child._parent === undefined){
         return undefined;
     }
     return nodeHash.get(child._parent as string);
 }
 
-export function ParentOf(child:Trunk, trunkCache:TrunkCache):Trunk|undefined {
+export function ParentOf(child:Trunk|undefined, trunkCache:TrunkCache):Trunk|undefined {
     return parentOf(child, trunkCache.nodeHash);
 }
 
@@ -254,10 +260,10 @@ export function SetValue(child:Trunk, trunkCache:TrunkCache, value:any){
 }
 
 
-export function NewItemBelow(child:Trunk, trunkCache:TrunkCache):boolean|Trunk{
+export function NewItemBelow(child:Trunk, trunkCache:TrunkCache):undefined|Trunk{
     // Ignore if Trunk
     if (child === trunkCache.current){
-        return false;
+        return undefined;
     }
 
     const childIdx = indexOf(child, trunkCache.nodeHash);
@@ -270,10 +276,10 @@ export function NewItemBelow(child:Trunk, trunkCache:TrunkCache):boolean|Trunk{
     return newItem;
 }
 
-export function NewItemAbove(child:Trunk, trunkCache:TrunkCache):boolean|Trunk {
+export function NewItemAbove(child:Trunk, trunkCache:TrunkCache):undefined|Trunk {
     // Ignore if Trunk
     if (child === trunkCache.current){
-        return false;
+        return undefined;
     }
 
     const childIdx = indexOf(child, trunkCache.nodeHash);
@@ -304,7 +310,7 @@ export function DeleteItem(child:Trunk, trunkCache:TrunkCache):boolean {
     return true;
 }
 
-export function IndentItem(child:Trunk, trunkCache:TrunkCache):boolean|Trunk {
+export function IndentItem(child:Trunk, trunkCache:TrunkCache):boolean {
     // Ignore if Trunk
     if (child === trunkCache.current){
         return false;

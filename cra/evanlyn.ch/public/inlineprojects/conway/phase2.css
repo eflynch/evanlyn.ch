@@ -1,0 +1,23 @@
+body {
+    margin: auto;
+    width: 700px;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #EEEEEE;
+}
+
+#game {
+    float: left;
+    border-style: dotted;
+    border-color: #CCC;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+#controls {
+    float: left;
+    margin-bottom: 15px;
+}

@@ -1,0 +1,51 @@
+.WALKMAN {
+    padding: 10px;
+    font-family: monospace;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+.WALKMAN .WALKMAN-controls .fa {
+    font-size:40px;
+}
+
+.WALKMAN .WALKMAN-controls .trackname {
+    font-size:40px;
+}
+
+.WALKMAN .elapsed-time {
+    font-size: 14px;
+}
+
+.WALKMAN li {
+    list-style: none;
+    cursor: pointer;
+}
+
+.WALKMAN li span.trackname {
+    margin-left: 30px;
+}
+
+.WALKMAN li span.trackname.playing {
+    margin-left: 0px;
+}
+
+.WALKMAN li:hover {
+    font-weight:bold;
+}
+
+.WALKMAN .disabled {
+    opacity: 0.3;
+}
+
+.WALKMAN .selected {
+    background-color: #0D6A91;
+    border-radius: 4px;
+}
+
+.WALKMAN .fa {
+    cursor:pointer;
+}

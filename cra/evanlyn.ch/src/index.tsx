@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Magnolial from './components/magnolial';
+import Magnolial from './components/Magnolial';
 import Whose from './components/Whose';
 import { Trunk } from './immutable-tree';
 
@@ -40,12 +40,12 @@ var initMagnolial = function(trunk:Trunk, saveMethod:(trunk:Trunk)=>void){
         } 
         root.render(
           <React.StrictMode>
-            <Magnolial initTrunk={trunk} initHead={initHead} onUpdate={(trunk:Trunk, head:string, focus:string) => {
-              if (window.location.hash !== "#"+head){
-                  window.history.pushState(null, "", "#"+head);
+            <Magnolial initTrunk={trunk} initHead={initHead} onUpdate={({trunk, headSerial}) => {
+              if (window.location.hash !== "#"+headSerial){
+                  window.history.pushState(null, "", "#"+headSerial);
               }
               saveMethod(trunk);
-            }} onBlur={(e:any) => {}}/>
+            }} />
           </React.StrictMode>
         );
     }

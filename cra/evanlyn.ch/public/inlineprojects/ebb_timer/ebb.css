@@ -1,0 +1,119 @@
+body {
+    width: 800px;
+    margin: auto;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    background-color: #FDF5DB;
+    color: #1C8173;
+    font-family: Monospace, sans-serif;
+    font-weight: 600;
+    text-align: center;
+
+}
+
+.ebb_unselectable {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+div.ebb {
+    position: absolute;
+    top: 100px;
+    text-align: left;
+    height: 100%;
+    width: 800px;
+    outline: none;
+    overflow: auto;
+    opacity: 1.0;
+    -webkit-transition: opacity 0.5s ease-in-out;
+    -moz-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
+}
+
+div.ebb_show {
+    opacity: 1.0;
+    -webkit-transition: opacity 6.5s ease-in-out;
+    -moz-transition: opacity 6.5s ease-in-out;
+    transition: opacity 6.5s ease-in-out;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    font-size: 300px;
+    position: fixed;
+    width: 800px;
+    margin-top: 100px;
+}
+
+div.ebb_giveup {
+    opacity: 0.0;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    font-size: 300px;
+    position: fixed;
+    width: 800px;
+    margin-top: 100px;
+}
+
+div.ebb_fade {
+    opacity: 0.0;
+    -webkit-transition: opacity 6.5s ease-in-out;
+    -moz-transition: opacity 6.5s ease-in-out;
+    transition: opacity 6.5s ease-in-out;
+}
+
+
+
+div.ebb_done {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer;
+    font-size: 30px;
+}
+
+div.ebb_done span {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+div.ebb_done span:hover {
+    color: #946600;
+}
+
+div.ebb_done span.disabled {
+    color: #9AA39C;
+}
+
+div.ebb_num {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    margin: 5;
+    margin-left: 10;
+    margin-right: 10;
+    cursor: pointer;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 25px;
+    width: 48px;
+    height: 48px;
+    display: inline-block;
+}
+
+div.ebb_num span {
+    font-size: 20px;
+    font-weight: 900;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width: 48px;
+    height: 48px;
+}
+
+div.ebb_num:hover {
+    background-color: #946600;
+    color: white;
+}

@@ -60,6 +60,7 @@ function Item(props:ItemProps):JSX.Element {
                                 setHead={props.setHead}
                                 setFocus={props.setFocus}/>
                     <Title trunk={props.trunk}
+                            focusCapture={true}
                             setTitle={props.setTitle}
                             setFocus={props.setFocus}
                             setHead={props.setHead}

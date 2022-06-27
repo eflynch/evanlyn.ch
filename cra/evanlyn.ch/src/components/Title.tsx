@@ -21,13 +21,14 @@ type TitleProps = {
     setTitle:(child:Trunk, title:string)=>void;
     hasContent:boolean;
     hasFocus:boolean;
+    focusCapture:boolean;
     hasLink:boolean;
     entryEnabled:boolean;
     trunk:Trunk;
 };
 
 function Title(props:TitleProps):JSX.Element {
-    const {setFocus, setHead, setTitle, hasFocus, hasContent, hasLink, entryEnabled, trunk} = props;
+    const {setFocus, setHead, setTitle, hasFocus, focusCapture, hasContent, hasLink, entryEnabled, trunk} = props;
     const input = useRef<HTMLDivElement>(null);
     const bottom = useRef<HTMLDivElement>(null);
     const onBlur = (e:any) => {
@@ -38,6 +39,22 @@ function Title(props:TitleProps):JSX.Element {
     const onFocus = (e:any) => {
         placeCaretAtEnd(input.current);
     };
+
+    useEffect(()=>{
+        const ref = entryEnabled ? input : bottom;
+        if (ref.current) {
+            ref.current.onblur = (e:any) => {
+                if (hasFocus && focusCapture) {
+                    setTimeout(()=>{ref.current?.focus();}, 0);
+                }
+            };
+        }
+        return () => {
+            if (ref.current) {
+                ref.current.onblur = null;
+            }
+        }
+    }, [focusCapture, entryEnabled, input, bottom, hasFocus]);
 
     useEffect(()=>{
         if (hasFocus) {

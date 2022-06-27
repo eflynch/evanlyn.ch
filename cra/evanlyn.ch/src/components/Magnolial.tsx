@@ -369,8 +369,6 @@ function Magnolial(props:MagnolialProps):JSX.Element {
         }
     }, [focus, head]);
 
-
-  
     useEffect(()=>{
         if (head && head.value.content === null && head.childs.length === 0) {
             const parent = ParentOf(head, trunkCache);
@@ -388,7 +386,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
             <div>
                 <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
                 <div className="title">
-                    <Title trunk={head} hasContent={false} hasLink={false} setTitle={setTitle} setFocus={setFocus} setHead={setHead} entryEnabled={entryEnabled} hasFocus={focus === head} />
+                    <Title trunk={head} hasContent={false} focusCapture={head.value.content === null || head.value.content === undefined} hasLink={false} setTitle={setTitle} setFocus={setFocus} setHead={setHead} entryEnabled={entryEnabled} hasFocus={focus === head} />
                 </div>
             </div>
             <div>

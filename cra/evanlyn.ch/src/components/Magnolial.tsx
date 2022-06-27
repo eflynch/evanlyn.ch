@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, } from 'react';
-import Item from './item';
-import Breadcrumbs from './breadcrumbs';
+import Item from './Item';
+import Breadcrumbs from './Breadcrumbs';
 import Title from './Title';
 
 import {
@@ -369,7 +369,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
             setFocusSerial(undefined);
         }} onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
             <div>
-                <Breadcrumbs setHead={setHead} setFocus={setFocus} ancestors={AncestorsOf(head, trunkCache)} />
+                <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
                 <div className="title">
                     <Title trunk={head} hasContent={false} hasLink={false} setTitle={setTitle} setFocus={setFocus} setHead={setHead} entryEnabled={entryEnabled} hasFocus={focus === head} />
                 </div>
@@ -379,7 +379,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
                     if (child === undefined) {
                         return <></>;
                     }
-                    return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} keyDownHandler={keyDownHandler} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
+                    return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
                 })}
             </div>
         </div>

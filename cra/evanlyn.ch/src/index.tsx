@@ -69,8 +69,8 @@ var loadPage = () => {
             initMagnolial(trunk, (trunk)=>{});
         }, ()=>{});
     } else if (whose === "yours") {
-        var trunk = JSON.parse(window.localStorage.getItem('trunk') || "");
-        if (trunk !== undefined && trunk !== null){
+        const trunk = JSON.parse(window.localStorage.getItem('trunk') || "{}");
+        if (trunk){
             initMagnolial(trunk, saveMethod);
         } else {
             getJSON("trunk.mgl", (trunk:Trunk) => {
@@ -83,20 +83,20 @@ var loadPage = () => {
 
 
   const renderWhose = (whoseItNow:string) => {
-      whose.render(<Whose changeWhose={(whose)=>{
+    const reset = () => {
+        window.localStorage.setItem("whose", "mine");
+        window.localStorage.removeItem("trunk");
+        renderWhose("mine");
+        loadPage();
+    };
+  
+      whose.render(<Whose reset={reset} changeWhose={(whose)=>{
           window.localStorage.setItem('whose', whose);
           loadPage();
           renderWhose(whose);
       }} whose={whoseItNow}/>);
   };
 
-  let divTag = document.getElementById("reset") as HTMLElement;
-  divTag.onclick = (e:any) => {
-      window.localStorage.setItem("whose", "mine");
-      window.localStorage.removeItem("trunk");
-      renderWhose("mine");
-      loadPage();
-  };
 
   var whoseItNow = window.localStorage.getItem('whose');
   if (whoseItNow !== "mine" && whoseItNow !== "yours"){

@@ -1,5 +1,17 @@
-import FontAwesome from 'react-fontawesome';
 import { Trunk } from '../immutable-tree';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import {
+    library,
+    IconName,
+    findIconDefinition
+} from '@fortawesome/fontawesome-svg-core'
+
+ 
+library.add(fas)
+const getIcon = (name:IconName) => {
+    return findIconDefinition({prefix: 'fas', iconName: name});
+}
 
 type DecorationProps = {
     trunk:Trunk;
@@ -14,6 +26,7 @@ type DecorationProps = {
 
 function Decoration(props:DecorationProps):JSX.Element {
     const onClick = (e:any) => {
+        console.log(e);
         if (e.metaKey){
             props.setHead(props.trunk);
         } else if (props.collapseable) {
@@ -27,7 +40,7 @@ function Decoration(props:DecorationProps):JSX.Element {
         }
     };
     const name = props.collapseable ? props.collapsed ? 'chevron-circle-right' : "chevron-down" : 'circle';
-    return <FontAwesome name={name} className="MAGNOLIAL_decoration" onClick={onClick}/>
+    return <FontAwesomeIcon icon={getIcon(name)} className="MAGNOLIAL_decoration" onClick={onClick}/>
 }
 
 export default Decoration;

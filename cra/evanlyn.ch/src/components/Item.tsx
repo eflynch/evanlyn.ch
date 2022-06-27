@@ -4,8 +4,6 @@ import Decoration from './Decoration';
 import { Trunk } from '../immutable-tree';
 import { propTypes } from 'react-bootstrap/esm/Image';
 
-var rb = require('react-bootstrap');
-
 type ItemProps = {
     trunk: Trunk;
     hasFocus: boolean;
@@ -52,31 +50,29 @@ function Item(props:ItemProps):JSX.Element {
     const hasLink = props.trunk.value.link !== null && props.trunk.value.link !== undefined;
     const listItem = (
         <li>
-            <rb.Col lg={12}>
-                <rb.Row onFocus={onFocus}>
-                <Decoration trunk={props.trunk}
-                                    collapseable={props.trunk.childs.length > 0} 
-                                    collapsed={props.trunk.collapsed}
-                                    toggleCollapsed={toggleCollapsed}
-                                    hasContent={hasContent}
-                                    hasLink={hasLink}
-                                    setHead={props.setHead}
-                                    setFocus={props.setFocus}/>
-                        <Title trunk={props.trunk}
-                               setTitle={props.setTitle}
-                               setFocus={props.setFocus}
-                               setHead={props.setHead}
-                               entryEnabled={props.entryEnabled}
-                               hasContent={hasContent}
-                               hasLink={hasLink}
-                               hasFocus={props.hasFocus}/>
-                </rb.Row>
-                <rb.Row className="MAGNOLIAL_list">
-                    <ul>
-                        {children()}
-                    </ul>
-                </rb.Row>
-            </rb.Col>
+            <div onFocus={onFocus}>
+            <Decoration trunk={props.trunk}
+                                collapseable={props.trunk.childs.length > 0} 
+                                collapsed={props.trunk.collapsed}
+                                toggleCollapsed={toggleCollapsed}
+                                hasContent={hasContent}
+                                hasLink={hasLink}
+                                setHead={props.setHead}
+                                setFocus={props.setFocus}/>
+                    <Title trunk={props.trunk}
+                            setTitle={props.setTitle}
+                            setFocus={props.setFocus}
+                            setHead={props.setHead}
+                            entryEnabled={props.entryEnabled}
+                            hasContent={hasContent}
+                            hasLink={hasLink}
+                            hasFocus={props.hasFocus}/>
+            </div>
+            <div className="MAGNOLIAL_list">
+                <ul>
+                    {children()}
+                </ul>
+            </div>
         </li>
     );
 

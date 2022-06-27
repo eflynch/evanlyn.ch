@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 type ContentIFrameProps = {
     src:string;
@@ -12,14 +12,14 @@ function ContentIFrame(props:ContentIFrameProps): JSX.Element {
         let iFrame = iFrameRef.current;
         if (iFrame) {
             iFrame.contentWindow?.focus();
-            if (iFrame.contentWindow?.document.body.onkeydown) {
-                iFrame.contentWindow.document.body.onkeydown = (e:any) => {
-                    if (e.key === "Escape") {
-                        props.onEscape();
-                    }
+            iFrame.contentWindow?.focus();
+        }
+        if (iFrame?.contentWindow?.document.body) {
+            iFrame.contentWindow.document.body.onkeydown = (e:any) => {
+                if (e.key === "Escape") {
+                    props.onEscape();
                 }
             }
-            iFrame.contentWindow?.focus();
         }
     };
 

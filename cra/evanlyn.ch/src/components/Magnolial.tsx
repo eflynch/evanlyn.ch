@@ -10,6 +10,7 @@ import {
     SuccOf, PredOf, Trunk, TrunkCache
 } from '../immutable-tree';
 import { CopyTextToClipboard } from '../utils';
+import ContentIFrame from './ContentIFrame';
 
 
 function usePreviousValue(value:any) { const ref = useRef(); useEffect(() => { ref.current = value; }); return ref.current; };
@@ -30,6 +31,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
 
     const [trunk, setTrunk] = useState<Trunk>(trunkCache.current);
     const [mode, setMode] = useState<string>('vim-default');
+    const [lastFocus, setLastFocus] = useState<string|undefined>(undefined);
 
     const [headSerial, setHeadSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
     const [focusSerial, setFocusSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
@@ -343,17 +345,33 @@ function Magnolial(props:MagnolialProps):JSX.Element {
     };
 
 
+    useEffect(()=> {
+        document.body.onfocus = (e:any) => {
+            if (focus === undefined) {
+                if (lastFocus) {
+                    setFocusSerial(lastFocus);
+                    setLastFocus(undefined);
+                } else {
+                    setFocus(head);
+                }
+            }
+        };
+
+        document.body.onblur = (e:any) => {
+            if (focus !== undefined) {
+                setLastFocus(focus._serial);
+                setFocusSerial(undefined);
+            }
+        };
+        return () => {
+            document.body.onfocus = null;
+            document.body.onblur = null;
+        }
+    }, [focus, head]);
+
+
   
     useEffect(()=>{
-        const content = head?.value.content;
-        const focusCapture = content === null || content === undefined;
-        if (focusSerial === undefined && focusCapture) {
-            if (headSerial !== previousHeadSerial) {
-                setFocus(head);
-            } else {
-                setFocus(head);
-            }
-        }
         if (head && head.value.content === null && head.childs.length === 0) {
             const parent = ParentOf(head, trunkCache);
             if (parent !== undefined) {
@@ -365,9 +383,8 @@ function Magnolial(props:MagnolialProps):JSX.Element {
     }, [onUpdate, trunk, headSerial, head, focusSerial, previousHeadSerial, trunkCache, setFocus])
 
     return (
-        <div className="MAGNOLIAL" onBlur={()=>{
-            setFocusSerial(undefined);
-        }} onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
+        <div className="MAGNOLIAL" onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
+            <div>
             <div>
                 <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
                 <div className="title">
@@ -375,12 +392,18 @@ function Magnolial(props:MagnolialProps):JSX.Element {
                 </div>
             </div>
             <div>
-                {head?.childs.map((child:Trunk|undefined) =>{
+                {(!head?.childs.length && head?.value.content !== null) ? 
+                    <ContentIFrame src={head.value.content} onEscape={()=> {
+                        setHead(ParentOf(head, trunkCache));
+                        setFocus(head);
+                    }} />
+                 : head?.childs.map((child:Trunk|undefined) =>{
                     if (child === undefined) {
                         return <></>;
                     }
                     return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
                 })}
+            </div>
             </div>
         </div>
     );

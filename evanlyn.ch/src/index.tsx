@@ -64,7 +64,6 @@ var loadPage = () => {
         window.localStorage.setItem('trunk', JSON.stringify(trunk));
     };
  
-    window.location.hash = "";
     if (whose === "mine") {
         getJSON("trunk.mgl", (trunk:Trunk) => {
             initMagnolial(trunk, (trunk)=>{});
@@ -79,11 +78,13 @@ const renderWhose = (whoseItNow:string) => {
     const reset = () => {
         window.localStorage.setItem("whose", "mine");
         window.localStorage.removeItem("trunk");
+        window.location.hash = "";
         window.location.reload();
     };
 
     whose.render(<Whose reset={reset} changeWhose={(whose)=>{
         window.localStorage.setItem('whose', whose);
+        window.location.hash = "";
         window.location.reload();
     }} whose={whoseItNow}/>);
 };

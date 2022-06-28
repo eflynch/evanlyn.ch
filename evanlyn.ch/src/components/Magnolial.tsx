@@ -1,7 +1,10 @@
-import React, { useRef, useEffect, useState, useCallback, } from 'react';
+import { useRef, useEffect, useState, useCallback, } from 'react';
+import { useSessionStorage } from 'react-use';
 import Item from './Item';
 import Breadcrumbs from './Breadcrumbs';
 import Title from './Title';
+
+import './Magnolial.css';
 
 import {
     OutdentItem, IndentItem, MoveItemUp, Undo, Redo,
@@ -46,7 +49,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
     const [headSerial, setHeadSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
     const [focusSerial, setFocusSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
 
-    const [mode, setMode] = useState<string>('vim-default');
+    const [mode, setMode] = useSessionStorage<string>('mode', 'vim-default');
 
     const entryEnabled = mode !== 'vim-default';
     const previousHeadSerial = usePreviousValue(headSerial);
@@ -395,7 +398,6 @@ function Magnolial(props:MagnolialProps):JSX.Element {
 
     const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
     const focus = GetTrunk(focusSerial, trunkCache);
-
     return (
         <div className="MAGNOLIAL" onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
             <div style={{
@@ -417,13 +419,31 @@ function Magnolial(props:MagnolialProps):JSX.Element {
                         if (child === undefined) {
                             return <></>;
                         }
-                        return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
+                        const numHeadAncestors = AncestorsOf(head, trunkCache).length;
+                        let focusAncestors = AncestorsOf(focus, trunkCache).slice(1 + numHeadAncestors);
+                        focusAncestors.push(focus);
+
+                        return <Item trunk={child}
+                                     key={child._serial}
+                                     focusAncestors={
+                                        focusAncestors[0] == child ?
+                                            focusAncestors.slice(1)
+                                        : null}
+                                     setHead={setHead}
+                                     setFocus={setFocus}
+                                     setCollapsed={setCollapsed}
+                                     entryEnabled={entryEnabled}
+                                     setTitle={setTitle}/>;
                     })}
                 </div>
             </div>
-            <div style={{position:"absolute", right: 15, bottom: 15}}>
-                <button onClick={()=>{setMode("standard");}}>std</button>
-                <button onClick={()=>{setMode("vim-default");}}>vim</button>
+            <div className="modes">
+                <button style={{
+                    color: mode === "standard" ? "#807861" : "",
+                }} onClick={()=>{setMode("standard");}}>std</button>
+                <button style={{
+                    color: mode === "standard" ? "" : "#807861",
+                }} onClick={()=>{setMode("vim-default");}}>vim</button>
             </div>
         </div>
     );

@@ -1,15 +1,12 @@
-import React from 'react';
+import {memo} from 'react';
 import Title from './Title';
 import Decoration from './Decoration';
 import { Trunk } from '../immutable-tree';
-import { propTypes } from 'react-bootstrap/esm/Image';
 
 type ItemProps = {
     trunk: Trunk;
-    hasFocus: boolean;
     entryEnabled: boolean;
-    focus:Trunk|undefined;
-    focusAncestors:[(Trunk|undefined)?];
+    focusAncestors:(Trunk|undefined)[]|null;
     setHead:(child:Trunk|undefined)=>void;
     setFocus:(child:Trunk|undefined)=>void;
     setCollapsed:(child:Trunk, collapsed:boolean)=>void;
@@ -25,15 +22,20 @@ function Item(props:ItemProps):JSX.Element {
             return [];
         }
         return (props.trunk.childs as [Trunk]).map((child:Trunk) => {
+            // pass maybeFocus only if not undefined and in focusAncestors
+            // pass focusAncestors
             return <Item trunk={child}
                          key={child._serial}
-                         focus={props.focus}
-                         hasFocus={props.focus === child}
-                         focusAncestors={props.focusAncestors}
+                         entryEnabled={props.entryEnabled}
+                         focusAncestors={
+                            props.focusAncestors ?
+                                props.focusAncestors[0] == child ?
+                                    props.focusAncestors.slice(1)
+                                    : null
+                                : null}
                          setHead={props.setHead}
                          setFocus={props.setFocus}
                          setCollapsed={props.setCollapsed}
-                         entryEnabled={props.entryEnabled}
                          setTitle={props.setTitle}/>;
         });
     }
@@ -42,12 +44,9 @@ function Item(props:ItemProps):JSX.Element {
         props.setCollapsed(props.trunk, !props.trunk.collapsed);
     };
 
-    // const onFocus = () => {
-    //     props.setFocus(props.trunk);
-    // };
-
     const hasContent = props.trunk.value.content !== null && props.trunk.value.content !== undefined;
     const hasLink = props.trunk.value.link !== null && props.trunk.value.link !== undefined;
+    const hasFocus = props.focusAncestors !== null && props.focusAncestors.length == 0;
     const listItem = (
         <li>
             <div>
@@ -67,7 +66,7 @@ function Item(props:ItemProps):JSX.Element {
                             entryEnabled={props.entryEnabled}
                             hasContent={hasContent}
                             hasLink={hasLink}
-                            hasFocus={props.hasFocus}/>
+                            hasFocus={hasFocus}/>
             </div>
             <div className="MAGNOLIAL_list">
                 <ul>
@@ -86,4 +85,4 @@ function Item(props:ItemProps):JSX.Element {
     return <div className="normal">{listItem}</div>;
 }
 
-export default Item;
+export default memo(Item);

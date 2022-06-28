@@ -16,7 +16,6 @@ function ContentEditable(props:ContentEditableProps):JSX.Element {
     const emitChange=(e:any) => {
         if (refInternal.current) {
             let html = refInternal.current.innerHTML;
-
             if (onChange && html !== lastHTML) {
                 onChange({target:{value: html}});
             }
@@ -36,7 +35,6 @@ function ContentEditable(props:ContentEditableProps):JSX.Element {
             contentEditable={!disabled}
             onInput={emitChange}
             onBlur={emitChange}
-            dangerouslySetInnerHTML={{__html: html}}
             { ...rest }
             spellCheck={false}>
         </div>

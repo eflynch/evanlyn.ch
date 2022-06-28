@@ -24,20 +24,29 @@ type MagnolialProps = {
 
 
 function Magnolial(props:MagnolialProps):JSX.Element {
+    const createTrunkCache = () => {
+        return CreateTrunkCache(props.initTrunk, (trunk:Trunk)=>{
+            setTrunk(trunk); 
+         }, { title: "", content: null, link: null});
+    };
 
-    const trunkCache = useRef<TrunkCache>(CreateTrunkCache(props.initTrunk, (trunk:Trunk)=>{
-        setTrunk(trunk); 
-     }, { title: "", content: null, link: null})).current;
+    const trunkCacheRef = useRef<TrunkCache>(createTrunkCache());
+    useEffect(()=>{
+        trunkCacheRef.current = createTrunkCache();
+        setTrunk(trunkCacheRef.current.current);
+    },[props.initTrunk]);
+
+
+
+    const trunkCache:TrunkCache = trunkCacheRef.current as TrunkCache;
 
     const [trunk, setTrunk] = useState<Trunk>(trunkCache.current);
-    const [mode, setMode] = useState<string>('vim-default');
     const [lastFocus, setLastFocus] = useState<string|undefined>(undefined);
 
     const [headSerial, setHeadSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
     const [focusSerial, setFocusSerial] = useState<string|undefined>(props.initHead || trunkCache.current._serial);
 
-    const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
-    const focus = GetTrunk(focusSerial, trunkCache);
+    const [mode, setMode] = useState<string>('vim-default');
 
     const entryEnabled = mode !== 'vim-default';
     const previousHeadSerial = usePreviousValue(headSerial);
@@ -59,6 +68,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
     };
 
     const setFocus = useCallback((child:Trunk|undefined) => {
+        const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
         if (child === undefined) {
             return;
         }
@@ -68,7 +78,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
             }
         }
         setFocusSerial(child._serial);
-    }, [trunkCache, head]);
+    }, [trunkCache, headSerial]);
 
     const setTitle = (child:Trunk, title:string) =>{
         SetValue(child, trunkCache, {
@@ -306,9 +316,8 @@ function Magnolial(props:MagnolialProps):JSX.Element {
                 e.preventDefault();
                 setCollapsed(child, !child.collapsed);
             }
-
         }
-        if (e.key === 27) { //'Escape'){
+        if (e.keyCode === 27) { //'Escape'){
             e.preventDefault();
             if (e.shiftKey) {
                 if (child.childs.length > 0) {
@@ -346,6 +355,9 @@ function Magnolial(props:MagnolialProps):JSX.Element {
 
 
     useEffect(()=> {
+        const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
+        const focus = GetTrunk(focusSerial, trunkCache);
+
         document.body.onfocus = (e:any) => {
             if (focus === undefined) {
                 if (lastFocus) {
@@ -367,9 +379,10 @@ function Magnolial(props:MagnolialProps):JSX.Element {
             document.body.onfocus = null;
             document.body.onblur = null;
         }
-    }, [focus, head]);
+    }, [focusSerial, headSerial]);
 
     useEffect(()=>{
+        const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
         if (head && head.value.content === null && head.childs.length === 0) {
             const parent = ParentOf(head, trunkCache);
             if (parent !== undefined) {
@@ -378,32 +391,39 @@ function Magnolial(props:MagnolialProps):JSX.Element {
             }
         }
         onUpdate({trunk, headSerial, focusSerial});
-    }, [onUpdate, trunk, headSerial, head, focusSerial, previousHeadSerial, trunkCache, setFocus])
+    }, [onUpdate, trunk, headSerial, focusSerial, previousHeadSerial, trunkCache, setFocus])
+
+    const head:Trunk = GetTrunk(headSerial, trunkCache) || trunkCache.current;
+    const focus = GetTrunk(focusSerial, trunkCache);
 
     return (
         <div className="MAGNOLIAL" onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
             <div style={{
                 width:"80%"
             }}>
-            <div>
-                <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
-                <div className="title">
-                    <Title trunk={head} hasContent={false} focusCapture={head.value.content === null || head.value.content === undefined} hasLink={false} setTitle={setTitle} setFocus={setFocus} setHead={setHead} entryEnabled={entryEnabled} hasFocus={focus === head} />
+                <div>
+                    <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
+                    <div className="title">
+                        <Title trunk={head} hasContent={false} focusCapture={head.value.content === null || head.value.content === undefined} hasLink={false} setTitle={setTitle} setFocus={setFocus} setHead={setHead} entryEnabled={entryEnabled} hasFocus={focus === head} />
+                    </div>
+                </div>
+                <div>
+                    {(!head?.childs.length && head?.value.content !== null) ? 
+                        <ContentIFrame src={head.value.content} onEscape={()=> {
+                            setHead(ParentOf(head, trunkCache));
+                            setFocus(head);
+                        }} />
+                    : head?.childs.map((child:Trunk|undefined) =>{
+                        if (child === undefined) {
+                            return <></>;
+                        }
+                        return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
+                    })}
                 </div>
             </div>
-            <div>
-                {(!head?.childs.length && head?.value.content !== null) ? 
-                    <ContentIFrame src={head.value.content} onEscape={()=> {
-                        setHead(ParentOf(head, trunkCache));
-                        setFocus(head);
-                    }} />
-                 : head?.childs.map((child:Trunk|undefined) =>{
-                    if (child === undefined) {
-                        return <></>;
-                    }
-                    return <Item trunk={child} key={child._serial} focus={focus} focusAncestors={AncestorsOf(focus, trunkCache)} setHead={setHead} setFocus={setFocus} setCollapsed={setCollapsed} entryEnabled={entryEnabled} hasFocus={focus === child} setTitle={setTitle}/>;
-                })}
-            </div>
+            <div style={{position:"absolute", right: 15, bottom: 15}}>
+                <button onClick={()=>{setMode("standard");}}>std</button>
+                <button onClick={()=>{setMode("vim-default");}}>vim</button>
             </div>
         </div>
     );

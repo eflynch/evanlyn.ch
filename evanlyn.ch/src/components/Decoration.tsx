@@ -26,7 +26,6 @@ type DecorationProps = {
 
 function Decoration(props:DecorationProps):JSX.Element {
     const onClick = (e:any) => {
-        console.log(e);
         if (e.metaKey){
             props.setHead(props.trunk);
         } else if (props.collapseable) {

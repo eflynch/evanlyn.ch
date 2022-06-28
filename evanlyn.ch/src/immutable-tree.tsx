@@ -74,7 +74,7 @@ function makeChild(parentSerial:string):Trunk{
 }
 
 export function CreateTrunkCache(trunk:Trunk, onMutate:(newTrunk: Trunk)=>void, baseValue:object):TrunkCache {
-    let createBaseValue = ()=>{JSON.parse(JSON.stringify(baseValue || {}))};
+    const createBaseValue = ()=>{return JSON.parse(JSON.stringify(baseValue || {}))};
     return {
         undos: [trunk],
         redos: [],
@@ -127,13 +127,13 @@ function generateHash(target:Trunk, nodeHash:Map<string, Trunk>){
 function applyHash(trunkCache:TrunkCache, hash:any){
     var newTrunk = update(trunkCache.current, hash.hashTrunk);
     fixNodeHash(newTrunk, trunkCache.nodeHash);
+    trunkCache.current = newTrunk;
     trunkCache.onMutate(newTrunk);
     if (trunkCache.undos.length > 10){
         trunkCache.undos.pop();
     }
     trunkCache.undos.unshift(trunkCache.current);
     trunkCache.redos = [];
-    trunkCache.current = newTrunk;
 };
 
 export function Undo(trunkCache:TrunkCache){

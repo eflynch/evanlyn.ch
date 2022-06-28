@@ -42,15 +42,15 @@ function Item(props:ItemProps):JSX.Element {
         props.setCollapsed(props.trunk, !props.trunk.collapsed);
     };
 
-    const onFocus = () => {
-        props.setFocus(props.trunk);
-    };
+    // const onFocus = () => {
+    //     props.setFocus(props.trunk);
+    // };
 
     const hasContent = props.trunk.value.content !== null && props.trunk.value.content !== undefined;
     const hasLink = props.trunk.value.link !== null && props.trunk.value.link !== undefined;
     const listItem = (
         <li>
-            <div onFocus={onFocus}>
+            <div>
             <Decoration trunk={props.trunk}
                                 collapseable={props.trunk.childs.length > 0} 
                                 collapsed={props.trunk.collapsed}

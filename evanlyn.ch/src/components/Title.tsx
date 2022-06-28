@@ -68,7 +68,7 @@ function Title(props:TitleProps):JSX.Element {
                 }
             }
         }
-    }, [hasFocus, input, bottom])
+    }, [entryEnabled, hasFocus, input, bottom])
 
     const onClick = (e:any) => {
         setFocus(trunk);
@@ -86,21 +86,27 @@ function Title(props:TitleProps):JSX.Element {
         }
     };
 
-    let className = 'MAGNOLIAL_ce';
-    if (entryEnabled){
-        className += ' MAGNOLIAL_readonly';
-    }
-    if (hasFocus){
-        className += ' MAGNOLIAL_focused';
-    }
+    const topClassName = [
+        'MAGNOLIAL_ce',
+        'MAGNOLIAL_ce_top',
+        !entryEnabled ? 'MAGNOLIAL_transparent' : '',
+        hasFocus ? 'MAGNOLIAL_focused' : ''
+    ].join(" ");
+    const bottomClassName = [
+        'MAGNOLIAL_ce',
+        'MAGNOLIAL_ce_bottom',
+        entryEnabled ? 'MAGNOLIAL_transparent' : '',
+        hasFocus ? 'MAGNOLIAL_focused' : ''
+    ].join(" ");
+
     return (
         <div  className="MAGNOLIAL_ce_wrapper" onClick={onClick}>
-            <ContentEditable className={className + " MAGNOLIAL_ce_bottom"}
+            <ContentEditable className={bottomClassName}
                                 refInternal={bottom}
                                 tabIndex={-1}
                                 html={trunk.value.title}
                                 disabled={true}/>
-            <ContentEditable refInternal={input} className={className + " MAGNOLIAL_ce_top"}
+            <ContentEditable refInternal={input} className={topClassName}
                                 html={trunk.value.title}
                                 onBlur={onBlur}
                                 onFocus={onFocus}

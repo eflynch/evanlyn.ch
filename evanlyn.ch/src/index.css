@@ -3,6 +3,16 @@ body {
   font-family: monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* background-color: black !important; */
+}
+
+input {
+  outline: none;
+  background-color:black;
+  width: 48%;
+  color: gray !important;
+  border-radius: 5px;
+  padding: 3px;
 }
 
 code {
@@ -32,18 +42,7 @@ div.link:hover {
 }
 
 
-body {
-  background-color: black !important;
-}
 
-input {
-  outline: none;
-  background-color:black;
-  width: 48%;
-  color: gray !important;
-  border-radius: 5px;
-  padding: 3px;
-}
 
 iframe {
   position: fixed;
@@ -82,7 +81,7 @@ input:focus {
   padding-top: 20px;
   padding-bottom: 30px;
   font-family: monospace;
-  background-color: black;
+  /* background-color: black; */
   color: #1C8173;
   display:flex;
   justify-content:center;
@@ -148,7 +147,6 @@ input:focus {
   position:absolute;
   top: 0;
   left: 0;
-  color: transparent;
   z-index: 1;
   min-width: 100px;
   min-height: 22px;
@@ -179,15 +177,18 @@ input:focus {
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 
-.MAGNOLIAL div.MAGNOLIAL_ce_bottom.MAGNOLIAL_focused {
-  background-color: #202020;
+.MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_focused {
+  background-color: #135a97;
+  color:#F6E7BA;
   border-radius: 3px;
   padding-left: 4px;
   padding-right: 4px;
 }
 
-.MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_focused{
-  color: #1A74CB;
+
+.MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_focused {
+  background-color: #135a97;
+  color:white;
 }
 
 .MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_completed {
@@ -195,8 +196,9 @@ input:focus {
   color: gray;
 }
 
-.MAGNOLIAL div.MAGNOLIAL_ce_top.MAGNOLIAL_readonly {
+.MAGNOLIAL div.MAGNOLIAL_ce.MAGNOLIAL_transparent {
   color:transparent!important;
+  background-color:transparent!important;
 }
 
 .MAGNOLIAL div.breadcrumb-wrapper {

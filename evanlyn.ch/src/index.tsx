@@ -63,46 +63,37 @@ var loadPage = () => {
     const saveMethod = (trunk:Trunk) => {
         window.localStorage.setItem('trunk', JSON.stringify(trunk));
     };
-  
+ 
+    window.location.hash = "";
     if (whose === "mine") {
         getJSON("trunk.mgl", (trunk:Trunk) => {
             initMagnolial(trunk, (trunk)=>{});
         }, ()=>{});
     } else if (whose === "yours") {
-        const trunk = JSON.parse(window.localStorage.getItem('trunk') || "{}");
-        if (trunk){
-            initMagnolial(trunk, saveMethod);
-        } else {
-            getJSON("trunk.mgl", (trunk:Trunk) => {
-                initMagnolial(trunk, saveMethod);
-            }, ()=>{});
-        }
+        const trunk = JSON.parse(window.localStorage.getItem('trunk') || '{"value":{"title":"yours"},"childs":[{}]}');
+        initMagnolial(trunk, saveMethod);
     }
 };
 
-
-
-  const renderWhose = (whoseItNow:string) => {
+const renderWhose = (whoseItNow:string) => {
     const reset = () => {
         window.localStorage.setItem("whose", "mine");
         window.localStorage.removeItem("trunk");
-        renderWhose("mine");
-        loadPage();
+        window.location.reload();
     };
-  
-      whose.render(<Whose reset={reset} changeWhose={(whose)=>{
-          window.localStorage.setItem('whose', whose);
-          loadPage();
-          renderWhose(whose);
-      }} whose={whoseItNow}/>);
-  };
+
+    whose.render(<Whose reset={reset} changeWhose={(whose)=>{
+        window.localStorage.setItem('whose', whose);
+        window.location.reload();
+    }} whose={whoseItNow}/>);
+};
 
 
-  var whoseItNow = window.localStorage.getItem('whose');
-  if (whoseItNow !== "mine" && whoseItNow !== "yours"){
-      window.localStorage.setItem('whose', 'mine');
-      whoseItNow = 'mine';
-  }
+let whoseItNow = window.localStorage.getItem('whose');
+if (whoseItNow !== "mine" && whoseItNow !== "yours"){
+    window.localStorage.setItem('whose', 'mine');
+    whoseItNow = 'mine';
+}
 
-  renderWhose(whoseItNow);
-  loadPage();
+renderWhose(whoseItNow);
+loadPage();

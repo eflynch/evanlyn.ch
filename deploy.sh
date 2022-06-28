@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rsync evanlyn.ch/build/* eflynch.github.io/
+rsync -r evanlyn.ch/build/* eflynch.github.io/
 cd eflynch.github.io
 git add --all
 git commit -m "Deploying: see eflynch/evanlyn.ch for meaningful versioning"

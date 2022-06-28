@@ -86,7 +86,7 @@ input:focus {
   color: #1C8173;
   display:flex;
   justify-content:center;
-  min-width: 500px;
+
   height: 100%;
 }
 

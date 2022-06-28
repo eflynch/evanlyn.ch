@@ -382,7 +382,9 @@ function Magnolial(props:MagnolialProps):JSX.Element {
 
     return (
         <div className="MAGNOLIAL" onKeyDown={(e:any)=>{keyDownHandler(e, focus || head);}} >
-            <div>
+            <div style={{
+                width:"80%"
+            }}>
             <div>
                 <Breadcrumbs setHead={setHead} ancestors={AncestorsOf(head, trunkCache)} />
                 <div className="title">

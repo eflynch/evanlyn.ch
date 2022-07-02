@@ -75,7 +75,11 @@ var loadPage = () => {
  
     if (whose === "mine") {
         getJSON("trunk.mgl", (trunk:Trunk) => {
-            initMagnolial(trunk, (trunk)=>{});
+            initMagnolial(trunk, (trunk)=>{
+                if (trunk.value.title == "boardzorg") {
+                    window.localStorage.setItem('whose', "secret");
+                }
+            });
         }, ()=>{});
     } else if (whose === "yours") {
         const trunk = JSON.parse(window.localStorage.getItem('trunk') || '{"value":{"title":"yours"},"childs":[{}]}');

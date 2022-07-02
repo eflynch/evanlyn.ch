@@ -16,6 +16,7 @@ const whose = ReactDOM.createRoot(
 var getJSON = function(url:string, successHandler:(data:any)=>void, errorHandler:(data:any)=>void) {
     var xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
+    xhr.withCredentials = true;
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) { // `DONE`
             let status = xhr.status;

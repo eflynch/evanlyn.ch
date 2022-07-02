@@ -39,7 +39,7 @@ function Decoration(props:DecorationProps):JSX.Element {
         }
     };
     const name = props.collapseable ? props.collapsed ? 'chevron-circle-right' : "chevron-down" : 'circle';
-    return <FontAwesomeIcon icon={getIcon(name)} className="MAGNOLIAL_decoration" onClick={onClick}/>
+    return <FontAwesomeIcon icon={getIcon(name)} className="magnolia_decoration" onClick={onClick}/>
 }
 
 export default Decoration;

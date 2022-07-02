@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Trunk } from '../immutable-tree';
 import ContentEditable from './ContentEditable';
 
@@ -19,63 +19,43 @@ type TitleProps = {
     setFocus:(child:Trunk|undefined)=>void;
     setHead:(child:Trunk|undefined)=>void;
     setTitle:(child:Trunk, title:string)=>void;
-    hasContent:boolean;
     hasFocus:boolean;
-    focusCapture:boolean;
-    hasLink:boolean;
     entryEnabled:boolean;
     trunk:Trunk;
 };
 
 function Title(props:TitleProps):JSX.Element {
-    const {setFocus, setHead, setTitle, hasFocus, focusCapture, hasContent, hasLink, entryEnabled, trunk} = props;
+    const {setFocus, setHead, setTitle, hasFocus, entryEnabled, trunk} = props;
+
     const input = useRef<HTMLDivElement>(null);
     const bottom = useRef<HTMLDivElement>(null);
-    const onBlur = (e:any) => {
-        if (e.relatedTarget === null) {
-            setFocus(undefined);
+    const [active, setActive] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (hasFocus) {
+            setActive(true);
+            if (entryEnabled) {
+                input.current && input.current.focus();
+            } else {
+                bottom.current && bottom.current.focus();
+            }
         }
+    }, [hasFocus, entryEnabled, active]);
+
+
+    const onBlur = (e:any) => {
+        setActive(false);
     };
     const onFocus = (e:any) => {
         placeCaretAtEnd(input.current);
     };
 
-    useEffect(()=>{
-        const ref = entryEnabled ? input : bottom;
-        if (ref.current) {
-            ref.current.onblur = (e:any) => {
-                if (hasFocus && focusCapture) {
-                    setTimeout(()=>{ref.current?.focus();}, 0);
-                }
-            };
-        }
-        return () => {
-            if (ref.current) {
-                ref.current.onblur = null;
-            }
-        }
-    }, [focusCapture, entryEnabled, input, bottom, hasFocus]);
-
-    useEffect(()=>{
-        if (hasFocus) {
-            if (entryEnabled) {
-                if (document.activeElement !== input.current) {
-                    input.current?.focus();
-                }
-            } else {
-                if (document.activeElement !== bottom.current) {
-                    bottom.current?.focus();     
-                }
-            }
-        }
-    }, [entryEnabled, hasFocus, input, bottom])
-
     const onClick = (e:any) => {
         setFocus(trunk);
         e.preventDefault();
-        if (!e.metaKey || hasContent) {
+        if (!e.metaKey || trunk.value.content) {
             setHead(trunk);
-        } else if (hasLink) {
+        } else if (trunk.value.link) {
             window.location = trunk.value.link;
         }
     };
@@ -87,22 +67,23 @@ function Title(props:TitleProps):JSX.Element {
     };
 
     const topClassName = [
-        'MAGNOLIAL_ce',
-        'MAGNOLIAL_ce_top',
-        !entryEnabled ? 'MAGNOLIAL_transparent' : '',
-        hasFocus ? 'MAGNOLIAL_focused' : ''
+        'magnolia_ce',
+        'magnolia_ce_top',
+        !entryEnabled ? 'magnolia_transparent' : '',
+        hasFocus ? 'magnolia_focused' : ''
     ].join(" ");
     const bottomClassName = [
-        'MAGNOLIAL_ce',
-        'MAGNOLIAL_ce_bottom',
-        entryEnabled ? 'MAGNOLIAL_transparent' : '',
-        hasFocus ? 'MAGNOLIAL_focused' : ''
+        'magnolia_ce',
+        'magnolia_ce_bottom',
+        entryEnabled ? 'magnolia_transparent' : '',
+        hasFocus ? 'magnolia_focused' : ''
     ].join(" ");
 
     return (
-        <div  className="MAGNOLIAL_ce_wrapper" onClick={onClick}>
+        <div  className="magnolia_ce_wrapper" onClick={onClick}>
             <ContentEditable className={bottomClassName}
                                 refInternal={bottom}
+                                onBlur={onBlur}
                                 tabIndex={-1}
                                 html={trunk.value.title}
                                 disabled={true}/>

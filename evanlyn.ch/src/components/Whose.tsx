@@ -11,7 +11,7 @@ type WhoseProps = {
 function Whose(props:WhoseProps): ReactElement {
     const {changeWhose, whose} = props;
     return (
-        <div style={{display:"flex", flexDirection:"column"}}>
+        <div className="whose" style={{display:"flex", flexDirection:"column"}}>
             <div style={{display:"flex"}}>
                 <button title="my version of this website" onClick={()=>changeWhose("mine")} style={{
                     color: whose === "mine" ? "#807861" : "",

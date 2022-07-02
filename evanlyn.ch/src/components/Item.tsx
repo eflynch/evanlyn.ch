@@ -25,11 +25,11 @@ function Item(props:ItemProps):JSX.Element {
             // pass maybeFocus only if not undefined and in focusAncestors
             // pass focusAncestors
             return <Item trunk={child}
-                         key={child._serial}
+                         key={child.serial}
                          entryEnabled={props.entryEnabled}
                          focusAncestors={
                             props.focusAncestors ?
-                                props.focusAncestors[0] == child ?
+                                props.focusAncestors[0] === child ?
                                     props.focusAncestors.slice(1)
                                     : null
                                 : null}
@@ -46,11 +46,11 @@ function Item(props:ItemProps):JSX.Element {
 
     const hasContent = props.trunk.value.content !== null && props.trunk.value.content !== undefined;
     const hasLink = props.trunk.value.link !== null && props.trunk.value.link !== undefined;
-    const hasFocus = props.focusAncestors !== null && props.focusAncestors.length == 0;
+    const hasFocus = props.focusAncestors !== null && props.focusAncestors.length === 0;
     const listItem = (
         <li>
             <div>
-            <Decoration trunk={props.trunk}
+                <Decoration trunk={props.trunk}
                                 collapseable={props.trunk.childs.length > 0} 
                                 collapsed={props.trunk.collapsed}
                                 toggleCollapsed={toggleCollapsed}
@@ -59,13 +59,10 @@ function Item(props:ItemProps):JSX.Element {
                                 setHead={props.setHead}
                                 setFocus={props.setFocus}/>
                     <Title trunk={props.trunk}
-                            focusCapture={true}
                             setTitle={props.setTitle}
                             setFocus={props.setFocus}
                             setHead={props.setHead}
                             entryEnabled={props.entryEnabled}
-                            hasContent={hasContent}
-                            hasLink={hasLink}
                             hasFocus={hasFocus}/>
             </div>
             <div className="MAGNOLIAL_list">

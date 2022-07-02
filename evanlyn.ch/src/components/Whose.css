@@ -1,18 +1,18 @@
 
-div#whose button {
+div.whose button {
     background: none;
     border: none;
     cursor: pointer;
     color:#135a97;
 }
 
-div#whose {
+div.whose {
     position: absolute;
     top: 3px;
     right: 10px;
 }
 
-div#whose button:hover {
+div.whose button:hover {
     color:#807861;
 }
 

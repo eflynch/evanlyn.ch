@@ -1,4 +1,3 @@
-import React from 'react';
 import { Trunk } from '../immutable-tree';
 
 const strip = (html:string) =>
@@ -9,7 +8,7 @@ const strip = (html:string) =>
 }
 
 type BreadcrumbsProps = {
-    ancestors:[(Trunk|undefined)?];
+    ancestors:(Trunk)[];
     setHead:(head:Trunk|undefined)=>void;
 };
 
@@ -27,7 +26,7 @@ function Breadcrumbs(props:BreadcrumbsProps):JSX.Element {
         const text = parent.value.title ? ellipsize(parent.value.title): "...";
         
         return (
-            <span key={parent._serial}>
+            <span key={parent.serial}>
                 <span className="breadcrumb-text" onClick={onClick}>
                     {text}
                 </span>

@@ -16,7 +16,13 @@ import { CopyTextToClipboard } from '../utils';
 import ContentIFrame from './ContentIFrame';
 
 
-function usePreviousValue(value:any) { const ref = useRef(); useEffect(() => { ref.current = value; }); return ref.current; };
+function usePreviousValue(value:any) {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+};
 
   
 type MagnolialProps = {

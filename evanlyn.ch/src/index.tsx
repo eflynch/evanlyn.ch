@@ -30,6 +30,14 @@ var getJSON = function(url:string, successHandler:(data:any)=>void, errorHandler
     xhr.send();
 };
 
+var putJSON = function(url:string, data:object) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('post', url);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.withCredentials = true;
+    xhr.send(JSON.stringify(data));
+};
+
 var initMagnolial = function(trunk:Trunk, saveMethod:(trunk:Trunk)=>void){
     const content = document.getElementById("content");
 
@@ -71,6 +79,13 @@ var loadPage = () => {
     } else if (whose === "yours") {
         const trunk = JSON.parse(window.localStorage.getItem('trunk') || '{"value":{"title":"yours"},"childs":[{}]}');
         initMagnolial(trunk, saveMethod);
+    } else if (whose === "secret") {
+        getJSON("https://boardzorg.org/zorg/trunk", (data:any)=>{
+            const trunk = data.trunk as Trunk;
+            initMagnolial(trunk, (trunk:Trunk) => {
+                putJSON("https://boardzorg.org/zorg/trunk", {trunk:trunk});
+            })
+        }, ()=>{});
     }
 };
 
@@ -91,7 +106,7 @@ const renderWhose = (whoseItNow:string) => {
 
 
 let whoseItNow = window.localStorage.getItem('whose');
-if (whoseItNow !== "mine" && whoseItNow !== "yours"){
+if (whoseItNow !== "mine" && whoseItNow !== "yours" && whoseItNow !== "secret"){
     window.localStorage.setItem('whose', 'mine');
     whoseItNow = 'mine';
 }

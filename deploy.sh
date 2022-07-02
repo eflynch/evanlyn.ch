@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd evanlyn.ch
+npm run build
+cd ..
 rsync -r evanlyn.ch/build/* eflynch.github.io/
 cd eflynch.github.io
 git add --all

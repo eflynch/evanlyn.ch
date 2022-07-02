@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 type ContentIFrameProps = {
     src:string;
     onEscape:()=>void;
+    bootstrap?:object;
 };
 
 function ContentIFrame(props:ContentIFrameProps): JSX.Element {
@@ -20,6 +21,9 @@ function ContentIFrame(props:ContentIFrameProps): JSX.Element {
                     props.onEscape();
                 }
             }
+        }
+        if (props.bootstrap && iFrame?.contentWindow) {
+            (iFrame.contentWindow as any).bootstrap = props.bootstrap;
         }
     };
 

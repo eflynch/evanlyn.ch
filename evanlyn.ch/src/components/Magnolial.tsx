@@ -417,7 +417,7 @@ function Magnolial(props:MagnolialProps):JSX.Element {
                 </div>
                 <div>
                     {(!head?.childs.length && head?.value.content !== null) ? 
-                        <ContentIFrame src={head.value.content} onEscape={()=> {
+                        <ContentIFrame bootstrap={{headSerial: head._serial as string}} src={head.value.content} onEscape={()=> {
                             setHead(ParentOf(head, trunkCache));
                             setFocus(head);
                         }} />

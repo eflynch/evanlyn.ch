@@ -98,7 +98,7 @@ function Magnolia():JSX.Element {
                 </div>
                 <div>
                     {(!head?.childs.length && head?.value.content !== null) ? 
-                        <ContentIFrame bootstrap={{headSerial: head.serial}} src={head.value.content} onEscape={()=> {
+                        <ContentIFrame bootstrap={head.value} src={head.value.content} onEscape={()=> {
                             setHead(ParentOf(tree, head));
                             setFocus(head);
                         }} />

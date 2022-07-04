@@ -37,7 +37,7 @@ export const CreateSerialGenerator = (size:number) => () => {
     return text.join('');
 };
 
-export function ParseTrunk(trunk:Trunk|PartialTrunk, createBaseValue:()=>any, makeSerial=CreateSerialGenerator(5)):Tree {
+export function ParseTrunk(trunk:Trunk|PartialTrunk, createBaseValue:()=>any, makeSerial=CreateSerialGenerator(5), newSerials:boolean=false):Tree {
     const lookup:any = {}; 
     const formatChild = (child:Trunk|PartialTrunk, parent:string|null) => {
         if (child.value === undefined || child.value === null){
@@ -51,7 +51,7 @@ export function ParseTrunk(trunk:Trunk|PartialTrunk, createBaseValue:()=>any, ma
         }
 
         child.parent = parent;
-        if (child.serial === undefined){
+        if (child.serial === undefined || newSerials){
             child.serial = makeSerial();
         }
         lookup[child.serial] = child;
@@ -122,7 +122,7 @@ export const Undo = (tree:Tree) => {
         return updateLookup(update(tree, {
             trunk: backwardHash.trunkHash,
             undo: {$splice: [[tree.undo.length - 1, 1]] },
-            redo: {$push: {forwardHash, backwardHash}},
+            redo: {$push: [{forwardHash, backwardHash}]},
         }), backwardHash.deletedSerials);
     } else {
         return tree;
@@ -134,7 +134,7 @@ export const Redo = (tree:Tree) => {
         const {forwardHash, backwardHash} = tree.redo[tree.redo.length - 1];
         return updateLookup(update(tree, {
             trunk: forwardHash.trunkHash,
-            undo: {$push: {forwardHash, backwardHash}},
+            undo: {$push: [{forwardHash, backwardHash}]},
             redo: {$splice: [[tree.redo.length - 1, 1]] },
         }), forwardHash.deletedSerials);
     } else {
@@ -143,7 +143,7 @@ export const Redo = (tree:Tree) => {
 };
 
 
-const makeChild = (makeSerial:()=>any, parentSerial:string) => {
+function makeChild(makeSerial:()=>any, parentSerial:string):Trunk {
     return {
         value: undefined,
         collapsed: false,
@@ -296,14 +296,20 @@ export function NewChild(tree:Tree, child:Trunk):{tree:Tree, newItem:Trunk} {
     };
 };
 
-export function NewSibling(tree:Tree, child:Trunk, index:number):{tree:Tree, newItem:Trunk|undefined} {
+export function NewSibling(tree:Tree, child:Trunk, index:number, sibling:Trunk|null=null):{tree:Tree, newItem:Trunk|undefined} {
     if (child === tree.trunk){
         return {tree:tree, newItem:undefined};
     }
     const parent = ParentOf(tree, child) as Trunk;
 
-    const newItem = makeChild(tree.makeSerial, child.parent as string);
-    newItem.value = tree.createBaseValue();
+    const newItem = (() => {
+        if (sibling) {
+            return sibling as Trunk
+        };
+        const newItem = makeChild(tree.makeSerial, child.parent as string);
+        newItem.value = tree.createBaseValue();
+        return newItem;
+    })();
 
 
     const forwardTrunkHash = generateTrunkHash(tree, parent, targetHash => {
@@ -460,7 +466,7 @@ export function MoveItem(tree:Tree, child:Trunk, index:number):Tree {
         if (oldIndex > newIndex) {
             spliceOp = [[oldIndex, 1], [newIndex, 0, child]];
         } else {
-            spliceOp = [[newIndex, 0, child], [oldIndex, 1]];
+            spliceOp = [[newIndex + 1, 0, child], [oldIndex, 1]];
         }
         targetHash.childs = {$splice : spliceOp};
     });
@@ -470,7 +476,7 @@ export function MoveItem(tree:Tree, child:Trunk, index:number):Tree {
         if (newIndex > oldIndex) {
             spliceOp = [[newIndex, 1], [oldIndex, 0, child]];
         } else {
-            spliceOp = [[oldIndex, 0, child], [newIndex, 1]];
+            spliceOp = [[oldIndex + 1, 0, child], [newIndex, 1]];
         }
         targetHash.childs = {$splice : spliceOp};
     });
@@ -486,4 +492,13 @@ export function MoveItemUp(tree:Tree, child:Trunk):Tree {
 export function MoveItemDown(tree:Tree, child:Trunk):Tree {
     const newIndex = IndexOf(tree, child) + 1;
     return MoveItem(tree, child, newIndex);
+};
+
+export function SpliceSubTree(tree:Tree, child:Trunk, subtree:Trunk):{tree:Tree,newItem:Trunk|undefined} {
+    const parent = ParentOf(tree, child);
+    const newSerialsSubTree = ParseTrunk(JSON.parse(JSON.stringify(subtree)), tree.createBaseValue, tree.makeSerial, true).trunk;
+    newSerialsSubTree.parent = parent?.serial || null;
+    const newSibling = NewSibling(tree, child, IndexOf(tree, child) + 1, newSerialsSubTree); 
+    const newTree = DeleteItem(newSibling.tree, child);
+    return {tree:newTree, newItem:newSibling.newItem};
 };

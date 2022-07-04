@@ -1,5 +1,5 @@
 import update from 'immutability-helper';
-import {Lookup, AncestorsOf, DeleteItem} from '../immutable-tree';
+import {Lookup, AncestorsOf, DeleteItem, SpliceSubTree} from '../immutable-tree';
 import {IndentItem, OutdentItem, MakeEmptyTree, ParentOf, SetCollapsed, NewChild} from '../immutable-tree';
 import {PredOf, SuccOf, MoveItemUp, MoveItemDown, NewItemAbove, NewItemBelow, Undo, Redo, SetValue} from '../immutable-tree';
 
@@ -136,6 +136,9 @@ const magnolia = (state, action) => {
                 return state;
             }
             return setFocus(setHead(state, ParentOf(state.tree, head)), head);
+        case 'PASTE':
+            const {tree, newItem} = SpliceSubTree(state.tree, action.child, action.subtree);
+            return setFocus(update(state, {tree: {$set: tree}}), newItem);
         default:
             return state;
     }

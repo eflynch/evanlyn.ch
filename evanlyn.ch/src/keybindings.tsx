@@ -148,14 +148,10 @@ const keyDownVimDefault = (e:any, child:Trunk, setMode:(mode:string)=>void, disp
         dispatch(Actions.UNDO());
     }
     if (e.keyCode === 69){ // e
-        if (e.shiftKey){
-            setContent(child, child.value.title, dispatch);
-        }
+        setContent(child, child.value.title, dispatch);
     }
     if (e.keyCode === 70){ // f
-        if (e.shiftKey){
-            setLink(child, child.value.title, dispatch);
-        }
+        setLink(child, child.value.title, dispatch);
     }
     if (e.keyCode === 82){ // r
         dispatch(Actions.REDO());
@@ -170,9 +166,7 @@ const keyDownVimDefault = (e:any, child:Trunk, setMode:(mode:string)=>void, disp
         setMode('vim-input');
     }
     if (e.keyCode === 68){ // d
-        if (e.shiftKey){
-            dispatch(Actions.DELETE(child));
-        }
+        dispatch(Actions.DELETE(child));
     }
     if (e.keyCode === 32){ // space
         e.preventDefault();
@@ -195,11 +189,8 @@ const keyDownVimDefault = (e:any, child:Trunk, setMode:(mode:string)=>void, disp
         dispatch(Actions.DELVE_OUT(child));
     }
 
-    if (e.keyCode === 87){ // w
-        if (e.shiftKey){
-            CopyTextToClipboard(JSON.stringify(child));
-            setContent(child, child.value.title, dispatch);
-        }
+    if (e.keyCode === 89){ // y
+        navigator.clipboard.writeText(JSON.stringify(child));
     }
 };
 
@@ -214,6 +205,9 @@ const keyDownVimInput = (e:any, child:Trunk, setMode:(mode:string)=>void, dispat
             return;
         }
         e.preventDefault();
+        if (child.value.link && child.childs.length === 0) {
+            window.location = child.value.link; 
+        }
         if (child.value.title === ''){
             dispatch(Actions.NEW(child));
         } else {

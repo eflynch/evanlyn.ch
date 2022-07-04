@@ -9,6 +9,12 @@ export const REMOTESYNC_OK = () => ({
 });
 
 
+export const PASTE = (child, subtree) => ({
+    type: 'PASTE',
+    child,
+    subtree
+});
+
 export const DELETE = (child) => ({
     type: 'DELETE',
     child
@@ -89,6 +95,7 @@ const Actions = {
     REMOTESYNC:REMOTESYNC,
     REMOTESYNC_ERROR:REMOTESYNC_ERROR,
     REMOTESYNC_OK:REMOTESYNC_OK,
+    PASTE:PASTE,
     DELETE:DELETE,
     INDENT:INDENT,
     OUTDENT:OUTDENT,

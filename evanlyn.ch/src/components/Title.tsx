@@ -1,5 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import Actions from '../actions';
+import MagnoliaContext from '../context';
 import { Trunk } from '../immutable-tree';
+import { MainState } from '../mainstate';
 import ContentEditable from './ContentEditable';
 
 function placeCaretAtEnd(el:any) {
@@ -26,6 +29,7 @@ type TitleProps = {
 
 function Title(props:TitleProps):JSX.Element {
     const {setFocus, setHead, setTitle, hasFocus, entryEnabled, trunk} = props;
+    const {dispatch} = useContext<{state:MainState, dispatch:React.Dispatch<any>}>(MagnoliaContext);
 
     const input = useRef<HTMLDivElement>(null);
     const bottom = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ function Title(props:TitleProps):JSX.Element {
     ].join(" ");
 
     return (
-        <div  className="magnolia_ce_wrapper" onClick={onClick}>
+        <div  className="magnolia_ce_wrapper" onClick={onClick}> 
             <ContentEditable className={bottomClassName}
                                 refInternal={bottom}
                                 onBlur={onBlur}
@@ -88,6 +92,22 @@ function Title(props:TitleProps):JSX.Element {
                                 html={trunk.value.title}
                                 disabled={true}/>
             <ContentEditable refInternal={input} className={topClassName}
+                                onPaste={(e:any)=>{
+                                    if (trunk.value.title) {
+                                        return;
+                                    }
+                                    const clipboardData = e.clipboardData;
+                                    const pastedData = clipboardData.getData('Text');
+                                    try {
+                                        const obj = JSON.parse(pastedData);
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        console.log("dispatch");
+                                        dispatch(Actions.PASTE(trunk, obj));
+                                    } catch {
+
+                                    }
+                                }}
                                 html={trunk.value.title}
                                 onBlur={onBlur}
                                 onFocus={onFocus}

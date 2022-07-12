@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+import sys
+import json
+import argparse
+
+def get_data(file):
+    data_so_far = ""
+    for line in file:
+        data_so_far = data_so_far + line.rstrip() 
+        try:
+            return json.loads(data_so_far)
+        except:
+            continue
+    return {'value':{'title':'No Data'}, 'childs':[]}
+
+def print_children(child, indentation=0):
+    for child in child['childs']:
+        title = child['value']['title']
+        print(" "*indentation + "* " + title)
+        print_children(child, indentation=indentation+2)
+
+def main():
+    parser = argparse.ArgumentParser(description="Converts Magnolia JSON representation to MarkDown")
+    parser.add_argument("--title-type", default="bullet", choices=["bullet", "header"])
+
+    args = parser.parse_args()
+    data = get_data(sys.stdin)
+    if args.title_type == "bullet":
+        print(f"* {data['value']['title']}")
+        print_children(data, indentation=2)
+    elif args.title_type == "header":
+        print(f"# {data['value']['title']}\n")
+        print_children(data, indentation=0)
+
+if __name__ == "__main__":
+    main()

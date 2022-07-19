@@ -47,11 +47,11 @@ div.link:hover {
 color: #135a97;
 }
 
-iframe {
+.magnolia iframe {
 position: fixed;
 left: 0;
 width: 100%;
-height: 100%;
+height: calc(100% - 127px);
 border: none;
 }
 

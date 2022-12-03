@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, } from 'react';
+import update from 'immutability-helper'
 import { useSessionStorage } from 'react-use';
 import Item from './Item';
 import Breadcrumbs from './Breadcrumbs';
@@ -31,7 +32,7 @@ function Magnolia():JSX.Element {
             dispatch(SET_FOCUS(tree.trunk));
         }
     };
-    useEffect(ensureHeadAndFocus, [headSerial, focusSerial, dispatch, tree.trunk]);
+    useEffect(ensureHeadAndFocus, [headSerial, focusSerial, dispatch, tree.trunk, tree]);
     const head:Trunk = headSerial ? Lookup(tree, headSerial) || tree.trunk : tree.trunk;
     const focus:Trunk = focusSerial ? Lookup(tree, focusSerial) || tree.trunk : tree.trunk;
 
@@ -41,22 +42,20 @@ function Magnolia():JSX.Element {
         if (focusCapture && focusSerial === null) {
             dispatch(SET_FOCUS(head));
         }
-        if (!head.value.content && head.childs.length === 0 && ParentOf(tree, head) !== undefined) {
+        if (!head.value.content && (head.value.note === undefined) && head.childs.length === 0 && ParentOf(tree, head) !== undefined) {
             dispatch(SET_HEAD(ParentOf(tree, head)));
             dispatch(SET_FOCUS(head));
         }
     }, [tree, focusSerial, head, dispatch]);
 
-    const entryEnabled = mode !== 'vim-default';
+    const entryEnabled = mode !== 'vim-default' && mode !== 'note-input';
+    const takingNotes = mode === 'note-input';
 
     const setTitle = (child:Trunk, title:string) => {
         dispatch(MODIFY(
             child,
-            {
-                title: title,
-                content: child.value.content,
-                link: child.value.link
-            }));
+            update(child.value, {title: {$set: title}})
+        ))
     };
 
     const setCollapsed = (child:Trunk, collapsedState:boolean) => {
@@ -77,7 +76,14 @@ function Magnolia():JSX.Element {
         dispatch(SET_FOCUS(child));
     };
 
-    const onKeyDown = KeyDownHandler(focus, mode, setMode, dispatch);
+    const setNotes = (child:Trunk, note:string) => {
+        if (child === undefined){
+            return;
+        }
+        dispatch(MODIFY(child, update(child.value, {note: {$set: note}})));
+    };
+
+    const onKeyDown = KeyDownHandler(focus, head, mode, setMode, dispatch);
 
     return (
         <div className="magnolia" onKeyDown={onKeyDown} >
@@ -92,12 +98,15 @@ function Magnolia():JSX.Element {
                             setTitle={setTitle}
                             setFocus={setFocus}
                             setHead={setHead}
+                            setNotes={setNotes}
+                            showNotes={head.value.note !== undefined && head.childs.length === 0}
+                            takingNotes={takingNotes}
                             entryEnabled={entryEnabled}
                             hasFocus={focus === head} />
                     </div>
                 </div>
                 <div>
-                    {(!head?.childs.length && head?.value.content !== null) ? 
+                    {(!head?.childs.length && head?.value.content !== null && head?.value.content !== undefined) ? 
                         <ContentIFrame bootstrap={head.value} src={head.value.content} onEscape={()=> {
                             setHead(ParentOf(tree, head));
                             setFocus(head);
@@ -118,8 +127,10 @@ function Magnolia():JSX.Element {
                                         : null}
                                      setHead={setHead}
                                      setFocus={setFocus}
+                                     setNotes={setNotes}
                                      setCollapsed={setCollapsed}
                                      entryEnabled={entryEnabled}
+                                     takingNotes={takingNotes}
                                      setTitle={setTitle}/>;
                     })}
                 </div>

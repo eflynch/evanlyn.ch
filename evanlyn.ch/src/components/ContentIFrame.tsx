@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 type ContentIFrameProps = {
     src:string;
@@ -27,7 +27,7 @@ function ContentIFrame(props:ContentIFrameProps): JSX.Element {
         }
     };
 
-    return <iframe ref={iFrameRef} onLoad={onLoad} src={props.src} />;
+    return <iframe title={props.src} ref={iFrameRef} onLoad={onLoad} src={props.src} />;
 };
 
 export default ContentIFrame;

@@ -234,3 +234,32 @@ display: inline-block;
 color: #DB9E31;
 
 }
+
+.magnolia .magnolia_note {
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-top:10px;
+  margin-bottom:10px;
+  color:#1C8173;
+}
+
+.magnolia .magnolia_note li {
+  list-style: unset;
+}
+
+.magnolia .magnolia_note p {
+  color: unset;
+  font-size: unset;
+  margin: unset;
+  padding: unset;
+  padding-left: unset;
+}
+  
+.magnolia .magnolia_note ul {
+  margin: unset;
+  margin-left: unset;
+  padding-left: unset;
+  border-left-width: unset;
+  border-left-style: unset;
+  border-left-color: unset;
+}

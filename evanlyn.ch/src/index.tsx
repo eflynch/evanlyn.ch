@@ -10,7 +10,6 @@ import { Trunk, ParseTrunk, MakeEmptyTree, PartialTrunk } from './immutable-tree
 import { MainState } from './mainstate';
 import MagnoliaContext from './context';
 import PromiseQueue from './promise-queue';
-import { REMOTESYNC, REMOTESYNC_OK, REMOTESYNC_ERROR } from './actions';
 
 import './index.css';
 
@@ -21,14 +20,6 @@ const root = ReactDOM.createRoot(
 function historyEffect(headSerial:string) {
     if (window.location.hash !== "#"+headSerial){
         window.history.pushState(null, "", "#"+headSerial);
-    }
-}
-
-function historyPopEffect() {
-    window.onpopstate = (e) => {
-    };
-    return ()=>{
-        window.onpopstate = null;
     }
 }
 

@@ -6,11 +6,13 @@ import { Trunk } from '../immutable-tree';
 type ItemProps = {
     trunk: Trunk;
     entryEnabled: boolean;
+    takingNotes: boolean;
     focusAncestors:(Trunk|undefined)[]|null;
     setHead:(child:Trunk|undefined)=>void;
     setFocus:(child:Trunk|undefined)=>void;
     setCollapsed:(child:Trunk, collapsed:boolean)=>void;
     setTitle:(child:Trunk, title:string)=>void;
+    setNotes:(child:Trunk, note:string)=>void;
 };
 
 function Item(props:ItemProps):JSX.Element {
@@ -27,6 +29,7 @@ function Item(props:ItemProps):JSX.Element {
             return <Item trunk={child}
                          key={child.serial}
                          entryEnabled={props.entryEnabled}
+                         takingNotes={props.takingNotes}
                          focusAncestors={
                             props.focusAncestors ?
                                 props.focusAncestors[0] === child ?
@@ -35,6 +38,7 @@ function Item(props:ItemProps):JSX.Element {
                                 : null}
                          setHead={props.setHead}
                          setFocus={props.setFocus}
+                         setNotes={props.setNotes}
                          setCollapsed={props.setCollapsed}
                          setTitle={props.setTitle}/>;
         });
@@ -44,14 +48,16 @@ function Item(props:ItemProps):JSX.Element {
         props.setCollapsed(props.trunk, !props.trunk.collapsed);
     };
 
+    const childs = children()
     const hasContent = props.trunk.value.content !== null && props.trunk.value.content !== undefined;
     const hasLink = props.trunk.value.link !== null && props.trunk.value.link !== undefined;
+    const hasNote = props.trunk.value.note !== null && props.trunk.value.note !== undefined && childs.length === 0;
     const hasFocus = props.focusAncestors !== null && props.focusAncestors.length === 0;
     const listItem = (
         <li>
             <div>
                 <Decoration trunk={props.trunk}
-                                collapseable={props.trunk.childs.length > 0} 
+                                collapseable={props.trunk.childs.length > 0 || hasNote} 
                                 collapsed={props.trunk.collapsed}
                                 toggleCollapsed={toggleCollapsed}
                                 hasContent={hasContent}
@@ -63,11 +69,14 @@ function Item(props:ItemProps):JSX.Element {
                             setFocus={props.setFocus}
                             setHead={props.setHead}
                             entryEnabled={props.entryEnabled}
+                            setNotes={props.setNotes}
+                            showNotes={hasNote && !props.trunk.collapsed}
+                            takingNotes={props.takingNotes}
                             hasFocus={hasFocus}/>
             </div>
             <div className="MAGNOLIAL_list">
                 <ul>
-                    {children()}
+                    {childs}
                 </ul>
             </div>
         </li>

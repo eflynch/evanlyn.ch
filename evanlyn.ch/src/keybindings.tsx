@@ -1,44 +1,42 @@
 
 import React from 'react';
+import update from 'immutability-helper'
 import Actions from './actions';
 import { Trunk } from './immutable-tree';
-import { CopyTextToClipboard } from './utils';
 
 const setTitle = (child:Trunk, title:string, dispatch:React.Dispatch<any>) => {
     dispatch(Actions.MODIFY(
         child,
-        {
-            title: title,
-            content: child.value.content,
-            link: child.value.link
-        }));
+        update(child.value, {title: {$set: title}})
+    ))
 };
 
 const setContent = (child:Trunk, content:string, dispatch:React.Dispatch<any>) => {
     dispatch(Actions.MODIFY(
         child,
-        {
-            title: child.value.title,
-            content: content,
-            link: child.value.link
-        }));
+        update(child.value, {content: {$set: content}})
+    ))
 };
 
 const setLink = (child:Trunk, link:string, dispatch:React.Dispatch<any>) => {
     dispatch(Actions.MODIFY(
         child,
-        {
-            title: child.value.title,
-            content: child.value.content,
-            link: link
-        }));
+        update(child.value, {link: {$set: link}})
+    ))
 };
 
+const setNote = (child:Trunk, note:string, dispatch:React.Dispatch<any>) => {
+    dispatch(Actions.MODIFY(
+        child,
+        update(child.value, {note: {$set: note}})
+    ))
+}
 
-const KeyDownHandler = (child:Trunk, mode:string, setMode:(mode:string)=>void, dispatch:React.Dispatch<any>) => (e:any) => {
+
+const KeyDownHandler = (child:Trunk, head:Trunk, mode:string, setMode:(mode:string)=>void, dispatch:React.Dispatch<any>) => (e:any) => {
     switch (mode){
         case 'vim-default':
-            keyDownVimDefault(e, child, setMode, dispatch);
+            keyDownVimDefault(e, child, head, setMode, dispatch);
             break;
         case 'vim-input':
             keyDownVimInput(e, child, setMode, dispatch);
@@ -46,6 +44,9 @@ const KeyDownHandler = (child:Trunk, mode:string, setMode:(mode:string)=>void, d
         case 'standard':
             keyDownStandard(e, child, setMode, dispatch);
             break;
+        case 'note-input':
+            keyDownNote(e, child, setMode, dispatch);
+            return;
         default:
             keyDownStandard(e, child, setMode, dispatch);
             break;
@@ -106,7 +107,14 @@ const keyDownCommon = (e:any, child:Trunk, setMode:(mode:string)=>void, dispatch
     }
 };
 
-const keyDownVimDefault = (e:any, child:Trunk, setMode:(mode:string)=>void, dispatch:React.Dispatch<any>) => {
+const keyDownNote = (e:any, child:Trunk, setMode:(mode:string)=>void, dispatch:React.Dispatch<any>) => {
+    if (e.keyCode === 27){ //'Escape'){
+        e.preventDefault();
+        setMode('vim-default')
+    }
+}
+
+const keyDownVimDefault = (e:any, child:Trunk, head:Trunk, setMode:(mode:string)=>void, dispatch:React.Dispatch<any>) => {
     if (e.metaKey){
         return;
     }
@@ -133,6 +141,14 @@ const keyDownVimDefault = (e:any, child:Trunk, setMode:(mode:string)=>void, disp
     if (e.keyCode === 76){ // l
         if (e.shiftKey){
             dispatch(Actions.INDENT(child));
+        }
+    }
+    if (e.keyCode === 78){ // n
+        if (child.childs.length === 0 && child.value.note === undefined) {
+            child.value.note ?? setNote(child, "", dispatch);
+        }
+        if (!child.collapsed || child === head) {
+            setMode('note-input');
         }
     }
     if (e.keyCode === 79){ // o

@@ -2,6 +2,9 @@
 
 cd evanlyn.ch
 npm run build
+cd scripts
+./makenoscript.sh https://evanlyn.ch/
+cd ..
 cd ..
 rsync -r evanlyn.ch/build/* eflynch.github.io/
 cd eflynch.github.io

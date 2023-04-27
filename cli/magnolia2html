@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import json
+import argparse
+import subprocess
+import urllib.parse
+
+def get_data(file):
+    data_so_far = ""
+    for line in file:
+        data_so_far = data_so_far + line.rstrip() 
+        try:
+            return json.loads(data_so_far)
+        except:
+            continue
+    return {'value':{'title':'No Data'}, 'childs':[]}
+
+
+def append_to_file(path):
+    def print_line(line):
+        with open(path, "a+") as f:
+            f.write(line + "\n") 
+    return print_line
+
+def print_note(child, args, breadcrumbs=[], print_line=print):
+    def print_body():
+        if breadcrumbs:
+            print_breadcrumbs(args, breadcrumbs, print_line=print_line)
+        if args.title_type == "bullet":
+            print_line(f"<li>{child['value']['title']}</li>")
+        elif args.title_type == "header":
+            print_line(f"<h3>{child['value']['title']}</h3>")
+        print_line(child['value']['note'])
+    print_document(args, print_body, child['value']['title'], print_line=print_line)
+
+def print_children(thistree, thischild, breadcrumbs, args, indentation=0, print_line=print):
+    for child in thischild['childs']:
+        title = child['value']['title']
+        collapsed = child['collapsed']
+        print_line(f"{indentation * ' '}<li>")
+        if collapsed and child['childs'] and args.out:
+            print_line(f"{indentation * ' '}<a href='noscript/{child['serial']}.html'>")
+            print_line(f"{indentation * ' '}{title}")
+            print_line(f"{indentation * ' '}</a>")
+            print_tree(child, args, breadcrumbs=breadcrumbs + [[f"noscript/{thistree['serial']}.html", thistree['value']['title']]], print_line=append_to_file(os.path.join(args.out, f"noscript/{child['serial']}.html")))
+        elif 'note' in child['value'] and child['value']['note'] is not None and args.out:
+            print_line(f"{indentation * ' '}<a href='noscriptnote/{child['serial']}.html'>{child['value']['title']}</a>")
+            print_note(child, args, breadcrumbs=breadcrumbs + [[f"noscript/{thistree['serial']}.html", thistree['value']['title']]], print_line=append_to_file(os.path.join(args.out, f"noscriptnote/{child['serial']}.html"))) 
+        elif 'link' in child['value'] and child['value']['link'] is not None:
+            print_line(f"{indentation * ' '}<a href='{child['value']['link']}'>{child['value']['title']}</a>")
+        elif 'content' in child['value'] and child['value']['content'] is not None:
+            print_line(f"{indentation * ' '}<a href='{child['value']['content']}'>{child['value']['title']}</a>")
+        else:
+            print_line(f"{indentation * ' '}{title}") 
+        
+        if child['childs'] and (not args.out or not collapsed):
+            print_line(f"{(indentation+2) * ' '}<ul>")
+            print_children(thistree, child, breadcrumbs, args, indentation=indentation+4, print_line=print_line)
+            print_line(f"{(indentation+2) * ' '}</ul>")
+        print_line(f"{(indentation) * ' '}</li>")
+
+def print_breadcrumbs(args, breadcrumbs, print_line=print):
+    def ellipsize(s, length=30):
+        return (s[:length] + '..') if len(s) > length else s
+    print_line("<div>")
+    if breadcrumbs:
+        print_line(f"<a href='{args.index}'>< {ellipsize(breadcrumbs[0][1])}</a>")
+    for [href, title] in breadcrumbs[1:]:
+        print_line(f"<a href='{href}'>< {ellipsize(title)}</a>")
+    print_line("</div>")
+
+def print_tree(data, args, breadcrumbs=[], print_line=print):
+    def print_body():
+        if breadcrumbs:
+            print_breadcrumbs(args, breadcrumbs, print_line=print_line)
+        if args.title_type == "bullet":
+            print_line("<ul>")
+            print_line(f"<li>{data['value']['title']}</li>")
+            print_line("<ul>")
+            print_children(data, data, breadcrumbs, args, indentation=2, print_line=print_line)
+            print_line("<ul>")
+            print_line("</ul>")
+        elif args.title_type == "header":
+            print_line(f"<h3>{data['value']['title']}</h3>")
+            print_line("<ul>")
+            print_children(data, data, breadcrumbs, args, indentation=2, print_line=print_line)
+            print_line("</ul>")
+    print_document(args, print_body, data['value']['title'], print_line=print_line)
+
+def print_document(args, print_body, title, print_line=print):
+    baseHref = f"<base href='{args.base_href}'/>" if args.base_href is not None else ''
+    css = f"<link rel='stylesheet' href={args.css}'/>" if args.css is not None else ''
+    print_line(f"<!DOCTYPE html><html><head>{baseHref}{css}<title>{title}</title></head><body>")
+    print_body()
+    print_line("</body></html>")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Converts Magnolia JSON representation to HTML")
+    parser.add_argument("--out", required=True)
+    parser.add_argument("--index", default="noscript.html")
+    parser.add_argument("--base-href", default=None)
+    parser.add_argument("--css", default=None)
+    parser.add_argument("--title-type", default="header", choices=["bullet", "header"])
+
+    args = parser.parse_args()
+    data = get_data(sys.stdin)
+
+
+    if os.path.exists(os.path.join(args.out, "noscript")):
+        subprocess.run(["rm", "-r", os.path.join(args.out, "noscript")])
+    subprocess.run(["mkdir", "-p", os.path.join(args.out, "noscript")])
+    if os.path.exists(os.path.join(args.out, "noscriptnote")):
+        subprocess.run(["rm", "-r", os.path.join(args.out, "noscriptnote")])
+    subprocess.run(["mkdir", "-p", os.path.join(args.out, "noscriptnote")])
+
+    if args.css is not None:
+        if os.path.exists(args.css):
+            subprocess.run(["cp", args.css, os.path.join(args.out, "/")])
+            args.css = os.path.basename(args.css)
+    print_tree(data, args, print_line=append_to_file(os.path.join(args.out, args.index)))
+        
+
+
+if __name__ == "__main__":
+    main()

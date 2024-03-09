@@ -1,7 +1,6 @@
 # evanlyn.ch #
 
-This is the source code for my website...
-
-my favorite file is src/immutable-tree.js
+The previous contents of this repo have moved to
+the mono-repo efl
 
 That's all I have to say really.
